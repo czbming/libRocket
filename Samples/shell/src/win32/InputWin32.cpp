@@ -31,6 +31,8 @@
 #include <Rocket/Debugger.h>
 #include <Shell.h>
 
+#pragma comment(lib, "imm32.lib")
+
 static int GetKeyModifierState();
 static void InitialiseKeymap();
 
@@ -107,13 +109,34 @@ void InputWin32::ProcessWindowsEvent(UINT message, WPARAM w_param, LPARAM l_para
 		case WM_CHAR:
 		{
 			// Only send through printable characters.
-			if (w_param >= 32)
+			if (w_param >= 32 && w_param <= 127)
 				context->ProcessTextInput((Rocket::Core::word) w_param);
 			// Or endlines - Windows sends them through as carriage returns.
 			else if (w_param == '\r')
 				context->ProcessTextInput((Rocket::Core::word) '\n');
 		}
 		break;
+
+		case WM_IME_COMPOSITION:
+			if(l_param & GCS_RESULTSTR) 
+			{
+				HIMC windows_context = ImmGetContext((HWND)Shell::GetWindowHandle());
+				if(windows_context == 0)
+					return;
+				size_t size = ImmGetCompositionStringW(windows_context, GCS_RESULTSTR,NULL, 0);
+				HANDLE handle = GlobalAlloc(GHND, sizeof(wchar_t) * (size + 1));
+				if(handle == 0)
+					return;
+				char* dest = (char*)GlobalLock(handle);		// UCS2
+				ImmGetCompositionStringW(windows_context, GCS_RESULTSTR, dest, size);
+				ImmReleaseContext((HWND)Shell::GetWindowHandle(), windows_context);
+
+				context->ProcessTextInput(Rocket::Core::WString((Rocket::Core::word*)dest, (Rocket::Core::word*)(dest+size)));
+
+				GlobalUnlock(handle);
+				GlobalFree(handle);
+			}
+			break;
 
 		case WM_KEYUP:
 			context->ProcessKeyUp(key_identifier_map[w_param], GetKeyModifierState());

@@ -567,7 +567,7 @@ bool Context::ProcessTextInput(word character)
 }
 
 // Sends a string of text as text input into Rocket.
-bool Context::ProcessTextInput(const String& string)
+bool Context::ProcessTextInput(const WString& string)
 {
 	bool consumed = true;
 

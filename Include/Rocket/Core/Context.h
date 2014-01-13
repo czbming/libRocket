@@ -33,7 +33,7 @@
 #include <Rocket/Core/ReferenceCountable.h>
 #include <Rocket/Core/ElementReference.h>
 #include <Rocket/Core/Input.h>
-#include <Rocket/Core/String.h>
+#include <Rocket/Core/WString.h>
 #include <Rocket/Core/ScriptInterface.h>
 
 namespace Rocket {
@@ -188,7 +188,7 @@ public:
 	/// Sends a string of text as text input into this context.
 	/// @param[in] string The UCS-2 string to send into this context.
 	/// @return True if the event was not consumed (ie, was prevented from propagating by an element), false if it was.
-	bool ProcessTextInput(const String& string);
+	bool ProcessTextInput(const WString& string);
 
 	/// Sends a mouse movement event into this context.
 	/// @param[in] x The x-coordinate of the mouse cursor, in window-coordinates (ie, 0 should be the left of the client area).
