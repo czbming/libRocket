@@ -63,7 +63,14 @@ FontFaceHandle::FontFaceHandle()
 FontFaceHandle::~FontFaceHandle()
 {
 	for (FontGlyphList::iterator i = glyphs.begin(); i != glyphs.end(); ++i)
-		delete[] i->bitmap_data;
+    {
+		FontGlyph* glyph = *i;
+		if (glyph)
+		{
+			delete[] glyph->bitmap_data;
+			delete glyph;
+		}
+    }
 
 	for (FontLayerMap::iterator i = layers.begin(); i != layers.end(); ++i)
 		delete i->second;
@@ -97,8 +104,10 @@ bool FontFaceHandle::Initialise(FT_Face ft_face, const String& _charset, int _si
 		max_codepoint = Math::Max(max_codepoint, charset[i].max_codepoint);
 
 	// Construct the list of the characters specified by the charset.
-	glyphs.resize(max_codepoint+1, FontGlyph());
-	for (size_t i = 0; i < charset.size(); ++i)
+	glyphs.resize(max_codepoint+1, NULL);
+
+    size_t charset_count = charset.size();
+	for (size_t i = 0; i < charset_count; ++i)
 		BuildGlyphMap(charset[i]);
 
 	// Generate the metrics for the handle.
@@ -154,19 +163,22 @@ int FontFaceHandle::GetStringWidth(const WString& string, word prior_character) 
 {
 	int width = 0;
 
+	size_t glyph_count = glyphs.size();
 	for (size_t i = 0; i < string.Length(); i++)
 	{
 		word character_code = string[i];
 
-		if (character_code >= glyphs.size())
+		if (character_code >= glyph_count)
 			continue;
-		const FontGlyph &glyph = glyphs[character_code];
+		const FontGlyph* glyph = glyphs[character_code];
+        if (!glyph)
+			continue;
 
 		// Adjust the cursor for the kerning between this character and the previous one.
 		if (prior_character != 0)
 			width += GetKerning(prior_character, string[i]);
 		// Adjust the cursor for this character's advance.
-		width += glyph.advance;
+		width += glyph->advance;
 
 		prior_character = character_code;
 	}
@@ -294,7 +306,9 @@ int FontFaceHandle::GenerateString(GeometryList& geometry, const WString& string
 		{
 			if (*string_iterator >= glyphs.size())
 				continue;
-			const FontGlyph &glyph = glyphs[*string_iterator];
+			const FontGlyph* glyph = glyphs[*string_iterator];
+            if (!glyph)
+				continue;
 
 			// Adjust the cursor for the kerning between this character and the previous one.
 			if (prior_character != 0)
@@ -302,7 +316,7 @@ int FontFaceHandle::GenerateString(GeometryList& geometry, const WString& string
 
 			layer->GenerateGeometry(&geometry[geometry_index], *string_iterator, Vector2f(position.x + line_width, position.y), layer_colour);
 
-			line_width += glyph.advance;
+			line_width += glyph->advance;
 			prior_character = *string_iterator;
 		}
 
@@ -366,9 +380,10 @@ void FontFaceHandle::GenerateMetrics()
 	unsigned int num_visible_glyphs = 0;
 	for (FontGlyphList::iterator i = glyphs.begin(); i != glyphs.end(); ++i)
 	{
-		if (i->advance)
+		const FontGlyph* glyph = *i;
+		if (glyph && glyph->advance)
 		{
-			average_advance += i->advance;
+			average_advance += glyph->advance;
 			num_visible_glyphs++;
 		}
 	}
@@ -407,9 +422,9 @@ void FontFaceHandle::BuildGlyphMap(const UnicodeRange& unicode_range)
 				continue;
 			}
 
-			FontGlyph glyph;
-			glyph.character = character_code;
-			BuildGlyph(glyph, ft_face->glyph);
+			FontGlyph* glyph = new FontGlyph;
+			glyph->character = character_code;
+			BuildGlyph(*glyph, ft_face->glyph);
 			glyphs[character_code] = glyph;
 		}
 	}

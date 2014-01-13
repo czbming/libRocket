@@ -137,9 +137,6 @@ private:
 	// Generates (or shares) a layer derived from a font effect.
 	FontFaceLayer* GenerateLayer(FontEffect* font_effect);
 
-	typedef std::vector< int > GlyphKerningList;
-	typedef std::vector< GlyphKerningList > FontKerningList;
-
 	FT_Face ft_face;
 
 	FontGlyphList glyphs;

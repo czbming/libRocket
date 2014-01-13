@@ -43,6 +43,12 @@ FontFaceLayer::~FontFaceLayer()
 {
 	if (effect != NULL)
 		effect->RemoveReference();
+
+	for (CharacterList::iterator i = characters.begin(); i != characters.end(); ++i)
+	{
+		if (*i)
+			delete *i;
+	}
 }
 
 // Generates the character and texture data for the layer.
@@ -62,7 +68,14 @@ bool FontFaceLayer::Initialise(const FontFaceHandle* _handle, FontEffect* _effec
 	if (clone != NULL)
 	{
 		// Copy the cloned layer's characters.
-		characters = clone->characters;
+		size_t character_count = clone->characters.size();
+		characters.resize(character_count, NULL);
+		for (size_t i = 0; i < character_count; ++i)
+		{
+			const Character* clone_character = clone->characters[i];
+			if (clone_character)
+				characters[i] = new Character(*clone_character);
+		}
 
 		// Copy (and reference) the cloned layer's textures.
 		for (size_t i = 0; i < clone->textures.size(); ++i)
@@ -74,51 +87,56 @@ bool FontFaceLayer::Initialise(const FontFaceHandle* _handle, FontEffect* _effec
 		{
 			for (FontGlyphList::const_iterator i = glyphs.begin(); i != glyphs.end(); ++i)
 			{
-				const FontGlyph& glyph = *i;
-
-				if (glyph.character >= characters.size())
+				const FontGlyph* glyph = *i;
+				if (!glyph)
 					continue;
 
-				Character& character = characters[glyph.character];
+				if (glyph->character >= characters.size())
+					continue;
 
-				Vector2i glyph_origin(Math::RealToInteger(character.origin.x), Math::RealToInteger(character.origin.y));
-				Vector2i glyph_dimensions(Math::RealToInteger(character.dimensions.x), Math::RealToInteger(character.dimensions.y));
+				Character* character = characters[glyph->character];
+				ROCKET_ASSERT(character);
 
-				if (effect->GetGlyphMetrics(glyph_origin, glyph_dimensions, glyph))
+				Vector2i glyph_origin(Math::RealToInteger(character->origin.x), Math::RealToInteger(character->origin.y));
+				Vector2i glyph_dimensions(Math::RealToInteger(character->dimensions.x), Math::RealToInteger(character->dimensions.y));
+
+				if (effect->GetGlyphMetrics(glyph_origin, glyph_dimensions, *glyph))
 				{
-					character.origin.x = (float) glyph_origin.x;
-					character.origin.y = (float) glyph_origin.y;
+					character->origin.x = (float) glyph_origin.x;
+					character->origin.y = (float) glyph_origin.y;
 				}
 				else
-					character.texture_index = -1;
+					character->texture_index = -1;
 			}
 		}
 	}
 	else
 	{
 		// Initialise the texture layout for the glyphs.
-		characters.resize(glyphs.size(), Character());
+		characters.resize(glyphs.size(), NULL);
 		for (FontGlyphList::const_iterator i = glyphs.begin(); i != glyphs.end(); ++i)
 		{
-			const FontGlyph& glyph = *i;
+			const FontGlyph* glyph = *i;
+			if (!glyph)
+				continue;
 
 			Vector2i glyph_origin(0, 0);
-			Vector2i glyph_dimensions = glyph.bitmap_dimensions;
+			Vector2i glyph_dimensions = glyph->bitmap_dimensions;
 
 			// Adjust glyph origin / dimensions for the font effect.
 			if (effect != NULL)
 			{
-				if (!effect->GetGlyphMetrics(glyph_origin, glyph_dimensions, glyph))
+				if (!effect->GetGlyphMetrics(glyph_origin, glyph_dimensions, *glyph))
 					continue;
 			}
 
-			Character character;
-			character.origin = Vector2f((float) (glyph_origin.x + glyph.bearing.x), (float) (glyph_origin.y - glyph.bearing.y));
-			character.dimensions = Vector2f((float) glyph_dimensions.x - glyph_origin.x, (float) glyph_dimensions.y - glyph_origin.y);
-			characters[glyph.character] = character;
+			Character* character = new Character();
+			character->origin = Vector2f((float) (glyph_origin.x + glyph->bearing.x), (float) (glyph_origin.y - glyph->bearing.y));
+			character->dimensions = Vector2f((float) glyph_dimensions.x - glyph_origin.x, (float) glyph_dimensions.y - glyph_origin.y);
+			characters[glyph->character] = character;
 
 			// Add the character's dimensions into the texture layout engine.
-			texture_layout.AddRectangle(glyph.character, glyph_dimensions - glyph_origin);
+			texture_layout.AddRectangle(glyph->character, glyph_dimensions - glyph_origin);
 		}
 
 		// Generate the texture layout; this will position the glyph rectangles efficiently and
@@ -129,25 +147,29 @@ bool FontFaceLayer::Initialise(const FontFaceHandle* _handle, FontEffect* _effec
 
 		// Iterate over each rectangle in the layout, copying the glyph data into the rectangle as
 		// appropriate and generating geometry.
-		for (int i = 0; i < texture_layout.GetNumRectangles(); ++i)
+		int rectangle_count = texture_layout.GetNumRectangles();
+		for (int i = 0; i < rectangle_count; ++i)
 		{
 			TextureLayoutRectangle& rectangle = texture_layout.GetRectangle(i);
+			Character* character = characters[(word) rectangle.GetId()];
+			if (!character)
+				continue;
 			const TextureLayoutTexture& texture = texture_layout.GetTexture(rectangle.GetTextureIndex());
-			Character& character = characters[(word) rectangle.GetId()];
 
 			// Set the character's texture index.
-			character.texture_index = rectangle.GetTextureIndex();
+			character->texture_index = rectangle.GetTextureIndex();
 
 			// Generate the character's texture coordinates.
-			character.texcoords[0].x = float(rectangle.GetPosition().x) / float(texture.GetDimensions().x);
-			character.texcoords[0].y = float(rectangle.GetPosition().y) / float(texture.GetDimensions().y);
-			character.texcoords[1].x = float(rectangle.GetPosition().x + rectangle.GetDimensions().x) / float(texture.GetDimensions().x);
-			character.texcoords[1].y = float(rectangle.GetPosition().y + rectangle.GetDimensions().y) / float(texture.GetDimensions().y);
+			character->texcoords[0].x = float(rectangle.GetPosition().x) / float(texture.GetDimensions().x);
+			character->texcoords[0].y = float(rectangle.GetPosition().y) / float(texture.GetDimensions().y);
+			character->texcoords[1].x = float(rectangle.GetPosition().x + rectangle.GetDimensions().x) / float(texture.GetDimensions().x);
+			character->texcoords[1].y = float(rectangle.GetPosition().y + rectangle.GetDimensions().y) / float(texture.GetDimensions().y);
 		}
 
 
 		// Generate the textures.
-		for (int i = 0; i < texture_layout.GetNumTextures(); ++i)
+		int texture_count = texture_layout.GetNumTextures();
+		for (int i = 0; i < texture_count; ++i)
 		{
 			Texture texture;
 			if (!texture.Load(String(64, "?font::%p/%p/%d", handle, effect, i)))
@@ -174,37 +196,42 @@ bool FontFaceLayer::GenerateTexture(const byte*& texture_data, Vector2i& texture
 	texture_data = texture_layout.GetTexture(texture_id).AllocateTexture();
 	texture_dimensions = texture_layout.GetTexture(texture_id).GetDimensions();
 
-	for (int i = 0; i < texture_layout.GetNumRectangles(); ++i)
+	int rectangle_count = texture_layout.GetNumRectangles();
+	for (int i = 0; i < rectangle_count; ++i)
 	{
 		TextureLayoutRectangle& rectangle = texture_layout.GetRectangle(i);
-		Character& character = characters[(word) rectangle.GetId()];	
-
-		if (character.texture_index != texture_id)
+		Character* character = characters[(word) rectangle.GetId()];	
+		if (!character)
 			continue;
 
-		const FontGlyph& glyph = glyphs[rectangle.GetId()];
+		if (character->texture_index != texture_id)
+			continue;
+
+		const FontGlyph* glyph = glyphs[rectangle.GetId()];
+		if (!glyph)
+			continue;
 
 		if (effect == NULL)
 		{
 			// Copy the glyph's bitmap data into its allocated texture.
-			if (glyph.bitmap_data != NULL)
+			if (glyph->bitmap_data != NULL)
 			{
 				byte* destination = rectangle.GetTextureData();
-				byte* source = glyph.bitmap_data;
+				byte* source = glyph->bitmap_data;
 
-				for (int j = 0; j < glyph.bitmap_dimensions.y; ++j)
+				for (int j = 0; j < glyph->bitmap_dimensions.y; ++j)
 				{
-					for (int k = 0; k < glyph.bitmap_dimensions.x; ++k)
+					for (int k = 0; k < glyph->bitmap_dimensions.x; ++k)
 						destination[k * 4 + 3] = source[k];
 
 					destination += rectangle.GetTextureStride();
-					source += glyph.bitmap_dimensions.x;
+					source += glyph->bitmap_dimensions.x;
 				}
 			}
 		}
 		else
 		{
-			effect->GenerateGlyphTexture(rectangle.GetTextureData(), Vector2i(Math::RealToInteger(character.dimensions.x), Math::RealToInteger(character.dimensions.y)), rectangle.GetTextureStride(), glyph);
+			effect->GenerateGlyphTexture(rectangle.GetTextureData(), Vector2i(Math::RealToInteger(character->dimensions.x), Math::RealToInteger(character->dimensions.y)), rectangle.GetTextureStride(), *glyph);
 		}
 	}
 

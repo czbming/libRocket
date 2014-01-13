@@ -78,17 +78,19 @@ public:
 		if (character_code >= characters.size())
 			return;
 
-		const Character& character = characters[character_code];
-		if (character.texture_index < 0)
+		const Character* character = characters[character_code];
+		if (!character)
+			return;
+		if (character->texture_index < 0)
 			return;
 
 		// Generate the geometry for the character.
-		std::vector< Vertex >& character_vertices = geometry[character.texture_index].GetVertices();
-		std::vector< int >& character_indices = geometry[character.texture_index].GetIndices();
+		std::vector< Vertex >& character_vertices = geometry[character->texture_index].GetVertices();
+		std::vector< int >& character_indices = geometry[character->texture_index].GetIndices();
 
 		character_vertices.resize(character_vertices.size() + 4);
 		character_indices.resize(character_indices.size() + 6);
-		GeometryUtilities::GenerateQuad(&character_vertices[0] + (character_vertices.size() - 4), &character_indices[0] + (character_indices.size() - 6), Vector2f(position.x + character.origin.x, position.y + character.origin.y), character.dimensions, colour, character.texcoords[0], character.texcoords[1], character_vertices.size() - 4);
+		GeometryUtilities::GenerateQuad(&character_vertices[0] + (character_vertices.size() - 4), &character_indices[0] + (character_indices.size() - 6), Vector2f(position.x + character->origin.x, position.y + character->origin.y), character->dimensions, colour, character->texcoords[0], character->texcoords[1], character_vertices.size() - 4);
 	}
 
 	/// Returns the effect used to generate the layer.
@@ -123,7 +125,7 @@ private:
 		int texture_index;
 	};
 
-	typedef std::vector< Character > CharacterList;
+	typedef std::vector< Character* > CharacterList;
 	typedef std::vector< Texture > TextureList;
 
 	const FontFaceHandle* handle;
