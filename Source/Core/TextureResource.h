@@ -43,8 +43,6 @@ namespace Core {
 
 class TextureResource : public ReferenceCountable
 {
-friend class TextureDatabase;
-
 public:
 	virtual ~TextureResource();
 
@@ -79,6 +77,8 @@ private:
 	typedef std::pair< TextureHandle, Vector2i > TextureData;
 	typedef std::map< RenderInterface*, TextureData > TextureDataMap;
 	mutable TextureDataMap texture_data;
+
+	friend class TextureDatabase;
 };
 
 }

@@ -91,7 +91,7 @@ bool FontFaceLayer::Initialise(const FontFaceHandle* _handle, FontEffect* _effec
 				if (!glyph)
 					continue;
 
-				if (glyph->character >= characters.size())
+				if (glyph->character >= character_count)
 					continue;
 
 				Character* character = characters[glyph->character];
@@ -120,23 +120,7 @@ bool FontFaceLayer::Initialise(const FontFaceHandle* _handle, FontEffect* _effec
 			if (!glyph)
 				continue;
 
-			Vector2i glyph_origin(0, 0);
-			Vector2i glyph_dimensions = glyph->bitmap_dimensions;
-
-			// Adjust glyph origin / dimensions for the font effect.
-			if (effect != NULL)
-			{
-				if (!effect->GetGlyphMetrics(glyph_origin, glyph_dimensions, *glyph))
-					continue;
-			}
-
-			Character* character = new Character();
-			character->origin = Vector2f((float) (glyph_origin.x + glyph->bearing.x), (float) (glyph_origin.y - glyph->bearing.y));
-			character->dimensions = Vector2f((float) glyph_dimensions.x - glyph_origin.x, (float) glyph_dimensions.y - glyph_origin.y);
-			characters[glyph->character] = character;
-
-			// Add the character's dimensions into the texture layout engine.
-			texture_layout.AddRectangle(glyph->character, glyph_dimensions - glyph_origin);
+			GenerateCharacter(*glyph);
 		}
 
 		// Generate the texture layout; this will position the glyph rectangles efficiently and
@@ -181,6 +165,32 @@ bool FontFaceLayer::Initialise(const FontFaceHandle* _handle, FontEffect* _effec
 
 
 	return true;
+}
+
+// Generates the character and rectangle for a glyph.
+void FontFaceLayer::GenerateCharacter( const FontGlyph& glyph )
+{
+	ROCKET_ASSERT(glyph.character < characters.size());
+	if (characters[glyph.character])
+		return;
+
+	Vector2i glyph_origin(0, 0);
+	Vector2i glyph_dimensions = glyph.bitmap_dimensions;
+
+	// Adjust glyph origin / dimensions for the font effect.
+	if (effect != NULL)
+	{
+		if (!effect->GetGlyphMetrics(glyph_origin, glyph_dimensions, glyph))
+			return;
+	}
+
+	Character* character = new Character();
+	character->origin = Vector2f((float) (glyph_origin.x + glyph.bearing.x), (float) (glyph_origin.y - glyph.bearing.y));
+	character->dimensions = Vector2f((float) glyph_dimensions.x - glyph_origin.x, (float) glyph_dimensions.y - glyph_origin.y);
+	characters[glyph.character] = character;
+
+	// Add the character's dimensions into the texture layout engine.
+	texture_layout.AddRectangle(glyph.character, glyph_dimensions - glyph_origin);
 }
 
 // Generates the texture data for a layer (for the texture database).

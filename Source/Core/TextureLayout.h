@@ -30,6 +30,7 @@
 
 #include "TextureLayoutRectangle.h"
 #include "TextureLayoutTexture.h"
+#include <queue>
 
 namespace Rocket {
 namespace Core {
@@ -75,11 +76,18 @@ public:
 	bool GenerateLayout(int max_texture_dimensions);
 
 private:
-	typedef std::vector< TextureLayoutRectangle > RectangleList;
-	typedef std::vector< TextureLayoutTexture > TextureList;
+	typedef std::vector< TextureLayoutRectangle* > RectangleList;
+	typedef std::queue< TextureLayoutRectangle* > RectangleQueue;
+	typedef std::vector< TextureLayoutTexture* > TextureList;
 
 	TextureList textures;
 	RectangleList rectangles;
+	RectangleQueue unplaced_rectangles;
+
+	Vector2i max_rectangle_dimension;
+
+	friend class TextureLayoutTexture;
+	friend class TextureLayoutRow;
 };
 
 }

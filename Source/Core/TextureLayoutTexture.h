@@ -64,6 +64,8 @@ public:
 	/// Allocates the texture.
 	/// @return The allocated texture data.
 	byte* AllocateTexture();
+	/// Deallocate the texture.
+	void DeallocateTexture();
 
 private:
 	typedef std::vector< TextureLayoutRow > RowList;
@@ -72,6 +74,7 @@ private:
 	RowList rows;
 
 	byte* texture_data;
+	int placed_height;
 };
 
 }

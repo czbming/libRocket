@@ -106,9 +106,17 @@ bool FontFaceHandle::Initialise(FT_Face ft_face, const String& _charset, int _si
 	// Construct the list of the characters specified by the charset.
 	glyphs.resize(max_codepoint+1, NULL);
 
-    size_t charset_count = charset.size();
+	// Prebuild charset list except the last one
+	size_t charset_count = charset.size();
+	if (charset_count > 1)
+		--charset_count;
 	for (size_t i = 0; i < charset_count; ++i)
-		BuildGlyphMap(charset[i]);
+	{
+		for (word character_code = (word) (Math::Max< unsigned int >(charset[i].min_codepoint, 32)); character_code <= charset[i].max_codepoint; ++character_code)
+		{
+			BuildGlyph(character_code);
+		}
+	}
 
 	// Generate the metrics for the handle.
 	GenerateMetrics();
@@ -401,33 +409,31 @@ void FontFaceHandle::GenerateMetrics()
 		x_height = 0;
 }
 
-void FontFaceHandle::BuildGlyphMap(const UnicodeRange& unicode_range)
+bool FontFaceHandle::BuildGlyph( word character_code )
 {
-	for (word character_code = (word) (Math::Max< unsigned int >(unicode_range.min_codepoint, 32)); character_code <= unicode_range.max_codepoint; ++character_code)
+	int index = FT_Get_Char_Index(ft_face, character_code);
+	if (index == 0)
+		return false;
+
+	FT_Error error = FT_Load_Glyph(ft_face, index, 0);
+	if (error != 0)
 	{
-		int index = FT_Get_Char_Index(ft_face, character_code);
-		if (index != 0)
-		{
-			FT_Error error = FT_Load_Glyph(ft_face, index, 0);
-			if (error != 0)
-			{
-				Log::Message(Log::LT_WARNING, "Unable to load glyph for character '%u' on the font face '%s %s'; error code: %d.", character_code, ft_face->family_name, ft_face->style_name, error);
-				continue;
-			}
-
-			error = FT_Render_Glyph(ft_face->glyph, FT_RENDER_MODE_NORMAL);
-			if (error != 0)
-			{
-				Log::Message(Log::LT_WARNING, "Unable to render glyph for character '%u' on the font face '%s %s'; error code: %d.", character_code, ft_face->family_name, ft_face->style_name, error);
-				continue;
-			}
-
-			FontGlyph* glyph = new FontGlyph;
-			glyph->character = character_code;
-			BuildGlyph(*glyph, ft_face->glyph);
-			glyphs[character_code] = glyph;
-		}
+		Log::Message(Log::LT_WARNING, "Unable to load glyph for character '%u' on the font face '%s %s'; error code: %d.", character_code, ft_face->family_name, ft_face->style_name, error);
+		return false;
 	}
+
+	error = FT_Render_Glyph(ft_face->glyph, FT_RENDER_MODE_NORMAL);
+	if (error != 0)
+	{
+		Log::Message(Log::LT_WARNING, "Unable to render glyph for character '%u' on the font face '%s %s'; error code: %d.", character_code, ft_face->family_name, ft_face->style_name, error);
+		return false;
+	}
+
+	FontGlyph* glyph = new FontGlyph;
+	glyph->character = character_code;
+	BuildGlyph(*glyph, ft_face->glyph);
+	glyphs[character_code] = glyph;
+	return true;
 }
 
 void FontFaceHandle::BuildGlyph(FontGlyph& glyph, FT_GlyphSlot ft_glyph)

@@ -45,38 +45,38 @@ public:
 
 	/// Returns the rectangle's id.
 	/// @return The rectangle's id.
-	int GetId() const;
+	inline int GetId() const;
 	/// Returns the rectangle's position; this is only valid if it has been placed.
 	/// @return The rectangle's position within its texture.
-	const Vector2i& GetPosition() const;
+	inline const Vector2i& GetPosition() const;
 	/// Returns the rectangle's dimensions.
 	/// @return The rectangle's dimensions.
-	const Vector2i& GetDimensions() const;
+	inline const Vector2i& GetDimensions() const;
 
 	/// Places the rectangle within a texture.
 	/// @param[in] texture_index The index of the texture this rectangle is placed on.
 	/// @param[in] position The position within the texture of this rectangle's top-left corner.
-	void Place(int texture_index, const Vector2i& position);
+	inline void Place(int texture_index, const Vector2i& position);
 	/// Unplaces the rectangle.
-	void Unplace();
+	inline void Unplace();
 	/// Returns the rectangle's placed state.
 	/// @return True if the rectangle has been placed, false if not.
-	bool IsPlaced() const;
+	inline bool IsPlaced() const;
 
 	/// Sets the rectangle's texture data and stride.
 	/// @param[in] texture_data The pointer to the top-left corner of the texture's data.
 	/// @param[in] texture_stride The stride of the texture data, in bytes.
-	void Allocate(byte* texture_data, int texture_stride);
+	inline void Allocate(byte* texture_data, int texture_stride);
 
 	/// Returns the index of the texture this rectangle is placed on.
 	/// @return The texture index.
-	int GetTextureIndex();
+	inline int GetTextureIndex();
 	/// Returns the rectangle's allocated texture data.
 	/// @return The texture data.
-	byte* GetTextureData();
+	inline byte* GetTextureData();
 	/// Returns the stride of the rectangle's texture data.
 	/// @return The texture data stride.
-	int GetTextureStride() const;
+	inline int GetTextureStride() const;
 
 private:
 	int id;
@@ -88,6 +88,68 @@ private:
 	byte* texture_data;
 	int texture_stride;
 };
+
+// Returns the rectangle's placed state.
+inline bool TextureLayoutRectangle::IsPlaced() const
+{
+	return texture_index > -1;
+}
+
+// Returns the rectangle's dimensions.
+inline const Vector2i& TextureLayoutRectangle::GetDimensions() const
+{
+	return dimensions;
+}
+
+// Returns the rectangle's id.
+inline int TextureLayoutRectangle::GetId() const
+{
+	return id;
+}
+
+// Returns the rectangle's position; this is only valid if it has been placed.
+inline const Vector2i& TextureLayoutRectangle::GetPosition() const
+{
+	return texture_position;
+}
+
+// Places the rectangle within a texture.
+inline void TextureLayoutRectangle::Place(int _texture_index, const Vector2i& position)
+{
+	texture_index = _texture_index;
+	texture_position = position;
+}
+
+// Unplaces the rectangle.
+inline void TextureLayoutRectangle::Unplace()
+{
+	texture_index = -1;
+}
+
+// Sets the rectangle's texture data and stride.
+inline void TextureLayoutRectangle::Allocate(byte* _texture_data, int _texture_stride)
+{
+	texture_data = _texture_data + ((texture_position.y * _texture_stride) + texture_position.x * 4);
+	texture_stride = _texture_stride;
+}
+
+// Returns the index of the texture this rectangle is placed on.
+inline int TextureLayoutRectangle::GetTextureIndex()
+{
+	return texture_index;
+}
+
+// Returns the rectangle's allocated texture data.
+inline byte* TextureLayoutRectangle::GetTextureData()
+{
+	return texture_data;
+}
+
+// Returns the stride of the rectangle's texture data.
+inline int TextureLayoutRectangle::GetTextureStride() const
+{
+	return texture_stride;
+}
 
 }
 }

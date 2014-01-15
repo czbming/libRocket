@@ -62,6 +62,8 @@ public:
 	/// @return True if the layer was generated successfully, false if not.
 	bool Initialise(const FontFaceHandle* handle, FontEffect* effect = NULL, const FontFaceLayer* clone = NULL, bool deep_clone = false);
 
+	/// Generates the character and rectangle for a glyph.
+	void GenerateCharacter(const FontGlyph& glyph);
 	/// Generates the texture data for a layer (for the texture database).
 	/// @param[out] texture_data The pointer to be set to the generated texture data.
 	/// @param[out] texture_dimensions The dimensions of the texture.
@@ -79,9 +81,7 @@ public:
 			return;
 
 		const Character* character = characters[character_code];
-		if (!character)
-			return;
-		if (character->texture_index < 0)
+		if (!character || character->texture_index < 0)
 			return;
 
 		// Generate the geometry for the character.

@@ -129,7 +129,7 @@ protected:
 private:
 	void GenerateMetrics(void);
 
-	void BuildGlyphMap(const UnicodeRange& unicode_range);
+	bool BuildGlyph(word character_code);
 	void BuildGlyph(FontGlyph& glyph, FT_GlyphSlot ft_glyph);
 
 	int GetKerning(word lhs, word rhs) const;

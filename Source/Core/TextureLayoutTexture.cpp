@@ -41,7 +41,7 @@ TextureLayoutTexture::TextureLayoutTexture() : dimensions(0, 0)
 
 TextureLayoutTexture::~TextureLayoutTexture()
 {
-	// Don't free texture data; freed in the texture loader.
+	DeallocateTexture();
 }
 
 // Returns the texture's dimensions. This is only valid after the texture has been generated.
@@ -57,19 +57,8 @@ int TextureLayoutTexture::Generate(TextureLayout& layout, int maximum_dimensions
 	// required by the remaining rectangles to place, square-root it to get the dimensions of the
 	// smallest texture necessary (under optimal circumstances) and round it up to the nearest
 	// power of two.
-	int square_pixels = 0;
-	int unplaced_rectangles = 0;
-	for (int i = 0; i < layout.GetNumRectangles(); ++i)
-	{
-		const TextureLayoutRectangle& rectangle = layout.GetRectangle(i);
-
-		if (!rectangle.IsPlaced())
-		{
-			square_pixels += (rectangle.GetDimensions().x + 1) * (rectangle.GetDimensions().y + 1);
-			++unplaced_rectangles;
-		}
-	}
-
+	int unplaced_rectangles = layout.unplaced_rectangles.size();
+	int square_pixels = unplaced_rectangles * (layout.max_rectangle_dimension.x + 1) * (layout.max_rectangle_dimension.y + 1);
 	int texture_width = Math::RealToInteger(Math::SquareRoot((float) square_pixels));
 	dimensions.y = Math::ToPowerOfTwo(texture_width);
 	dimensions.x = dimensions.y >> 1;
@@ -101,6 +90,14 @@ int TextureLayoutTexture::Generate(TextureLayout& layout, int maximum_dimensions
 			{
 				// D'oh! We've exceeded our height boundaries. This row should be unplaced.
 				row.Unplace();
+
+				// Restored to unplaced rectangle queue
+				int rectangle_count = layout.rectangles.size();
+				int reserve_size = rectangle_count - row_size;
+				for (int i = reserve_size; i < rectangle_count; ++i)
+					layout.unplaced_rectangles.push(layout.rectangles[i]);
+				layout.rectangles.resize(reserve_size);
+
 				success = false;
 				break;
 			}
@@ -130,6 +127,12 @@ int TextureLayoutTexture::Generate(TextureLayout& layout, int maximum_dimensions
 		for (size_t i = 0; i < rows.size(); i++)
 			rows[i].Unplace();
 
+		int rectangle_count = layout.rectangles.size();
+		int reserve_size = rectangle_count - num_placed_rectangles;
+		for (int i = reserve_size; i < rectangle_count; ++i)
+			layout.unplaced_rectangles.push(layout.rectangles[i]);
+		layout.rectangles.resize(reserve_size);
+
 		rows.clear();
 		num_placed_rectangles = 0;
 	}
@@ -138,7 +141,6 @@ int TextureLayoutTexture::Generate(TextureLayout& layout, int maximum_dimensions
 // Allocates the texture.
 byte* TextureLayoutTexture::AllocateTexture()
 {
-	// Note: this object does not free this texture data. It is freed in the font texture loader.
 
 	if (dimensions.x > 0 &&
 		dimensions.y > 0)
@@ -154,6 +156,16 @@ byte* TextureLayoutTexture::AllocateTexture()
 	}
 
 	return texture_data;
+}
+
+// Deallocate the texture.
+void TextureLayoutTexture::DeallocateTexture()
+{
+	if (texture_data)
+	{
+		delete[] texture_data;
+		texture_data = NULL;
+	}
 }
 
 }
