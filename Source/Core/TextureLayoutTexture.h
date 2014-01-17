@@ -67,6 +67,8 @@ public:
 	/// Deallocate the texture.
 	void DeallocateTexture();
 
+	inline bool IsFull() const;
+
 private:
 	typedef std::vector< TextureLayoutRow > RowList;
 
@@ -75,7 +77,13 @@ private:
 
 	byte* texture_data;
 	int placed_height;
+	bool is_full;
 };
+
+inline bool TextureLayoutTexture::IsFull() const
+{
+	return is_full;
+}
 
 }
 }

@@ -49,7 +49,7 @@ public:
 
 	/// Attempts to position unplaced rectangles from the layout into this row.
 	/// @param[in] layout The layout to position rectangles from.
-	/// @param[in] width The maximum width of this row.
+	/// @param[in] max_width The maximum width of this row.
 	/// @param[in] y The y-coordinate of this row.
 	/// @return The number of placed rectangles.
 	int Generate(TextureLayout& layout, int max_width, int y);

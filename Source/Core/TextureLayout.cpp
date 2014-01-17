@@ -35,6 +35,7 @@ namespace Core {
 
 TextureLayout::TextureLayout()
 {
+	has_generated = false;
 }
 
 TextureLayout::~TextureLayout()
@@ -93,16 +94,35 @@ int TextureLayout::GetNumTextures() const
 // Attempts to generate an efficient texture layout for the rectangles.
 bool TextureLayout::GenerateLayout(int max_texture_dimensions)
 {
-	while (!unplaced_rectangles.empty())
+	if (has_generated)
 	{
-		TextureLayoutTexture* texture = new TextureLayoutTexture();
-		if (texture->Generate(*this, max_texture_dimensions) == 0)
+		while (!unplaced_rectangles.empty())
 		{
-			delete texture;
-			return false;
+			if (textures.back()->IsFull())
+			{
+				TextureLayoutTexture* texture = new TextureLayoutTexture();
+				textures.push_back(texture);
+				texture->Generate(*this, max_texture_dimensions >> 1);	// Half-dimension
+			}
+			else
+				textures.back()->Generate(*this, max_texture_dimensions);
 		}
+	}
+	else
+	{
+		// Initial generation
+		while (!unplaced_rectangles.empty())
+		{
+			TextureLayoutTexture* texture = new TextureLayoutTexture();
+			if (texture->Generate(*this, max_texture_dimensions) == 0)
+			{
+				delete texture;
+				return false;
+			}
 
-		textures.push_back(texture);
+			textures.push_back(texture);
+		}
+		has_generated = true;
 	}
 
 	return true;

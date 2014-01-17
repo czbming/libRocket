@@ -126,7 +126,6 @@ bool FontFaceHandle::Initialise(FT_Face ft_face, const String& _charset, int _si
 	layer_configurations.push_back(LayerConfiguration());
 	layer_configurations.back().push_back(base_layer);
 
-
 	return true;
 }
 
@@ -276,13 +275,14 @@ bool FontFaceHandle::GenerateLayerTexture(const byte*& texture_data, Vector2i& t
 }
 
 // Generates the geometry required to render a single line of text.
-int FontFaceHandle::GenerateString(GeometryList& geometry, const WString& string, const Vector2f& position, const Colourb& colour, int layer_configuration_index) const
+int FontFaceHandle::GenerateString(GeometryList& geometry, const WString& string, const Vector2f& position, const Colourb& colour, int layer_configuration_index)
 {
 	int geometry_index = 0;
 	int line_width = 0;
 
 	ROCKET_ASSERT(layer_configuration_index >= 0);
 	ROCKET_ASSERT(layer_configuration_index < (int) layer_configurations.size());
+	int glyph_count = glyphs.size();
 
 	// Fetch the requested configuration and generate the geometry for each one.
 	const LayerConfiguration& layer_configuration = layer_configurations[layer_configuration_index];
@@ -297,38 +297,91 @@ int FontFaceHandle::GenerateString(GeometryList& geometry, const WString& string
 			layer_colour = layer->GetColour();
 
 		// Resize the geometry list if required.
-		if ((int) geometry.size() < geometry_index + layer->GetNumTextures())
-			geometry.resize(geometry_index + layer->GetNumTextures());
+		int num_textures = layer->GetNumTextures();
+		if ((int) geometry.size() < geometry_index + num_textures)
+			geometry.resize(geometry_index + num_textures);
 
 		// Bind the textures to the geometries.
-		for (int i = 0; i < layer->GetNumTextures(); ++i)
+		for (int i = 0; i < num_textures; ++i)
 			geometry[geometry_index + i].SetTexture(layer->GetTexture(i));
+
+		WString valid_string(string.Length(), 0);
+		int valid_string_length = 0;
+		const word* string_iterator = string.CString();
+		const word* string_end = string.CString() + string.Length();
+
+		// Dynamic build glyph and generate character
+		for (; string_iterator != string_end; string_iterator++)
+		{
+			if (*string_iterator >= glyph_count)
+				continue;
+
+			const FontGlyph* glyph = glyphs[*string_iterator];
+			if (!glyph)
+			{
+				if (!BuildGlyph(*string_iterator))
+					continue;
+				glyph = glyphs[*string_iterator];
+			}
+			
+			ROCKET_ASSERT(glyph);
+			layer->GenerateCharacter(*glyph);
+			
+			valid_string[valid_string_length] = *string_iterator;
+			valid_string_length++;
+		}
+		valid_string.Resize(valid_string_length);
+
+		// Generate texture layout base on the newly generated characters.
+		const FontEffect* effect = layer->GetFontEffect();
+		if (!effect || effect->HasUniqueTexture())
+		{
+			// Base layer or outline effect layer
+			layer->GenerateLayout();
+		}
+		else if (layer_configuration[0] != base_layer)
+		{
+			// Shadow effect layer, reference the base layer's texture.
+			string_iterator = valid_string.CString();
+			string_end = valid_string.CString() + valid_string.Length();
+
+			for (; string_iterator != string_end; string_iterator++)
+				base_layer->GenerateCharacter(*glyphs[*string_iterator]);
+			base_layer->GenerateLayout();
+			layer->CloneTexture(base_layer);
+		}
+
+		if (num_textures < layer->GetNumTextures())
+		{
+			for (int i = num_textures; i < layer->GetNumTextures(); ++i)
+			{
+				Geometry geom;
+				geom.SetTexture(layer->GetTexture(i));
+				geometry.insert(geometry.begin()+geometry_index+i, geom);
+			}
+			num_textures = layer->GetNumTextures();
+		}
 
 		line_width = 0;
 		word prior_character = 0;
 
-		const word* string_iterator = string.CString();
-		const word* string_end = string.CString() + string.Length();
+		// Generate geometry
+		string_iterator = valid_string.CString();
+		string_end = valid_string.CString() + valid_string.Length();
 
 		for (; string_iterator != string_end; string_iterator++)
 		{
-			if (*string_iterator >= glyphs.size())
-				continue;
-			const FontGlyph* glyph = glyphs[*string_iterator];
-            if (!glyph)
-				continue;
-
 			// Adjust the cursor for the kerning between this character and the previous one.
 			if (prior_character != 0)
 				line_width += GetKerning(prior_character, *string_iterator);
 
 			layer->GenerateGeometry(&geometry[geometry_index], *string_iterator, Vector2f(position.x + line_width, position.y), layer_colour);
 
-			line_width += glyph->advance;
-			prior_character = *string_iterator;
+			line_width += glyphs[*string_iterator]->advance;
+			prior_character = *string_iterator; 
 		}
 
-		geometry_index += layer->GetNumTextures();
+		geometry_index += num_textures;
 	}
 
 	// Cull any excess geometry from a previous generation.

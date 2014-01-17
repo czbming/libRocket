@@ -64,6 +64,10 @@ public:
 
 	/// Generates the character and rectangle for a glyph.
 	void GenerateCharacter(const FontGlyph& glyph);
+	/// Generate texture layout for all unplaced characters
+	bool GenerateLayout();
+	/// Copy (and reference) the cloned layer's textures.
+	void CloneTexture(const FontFaceLayer* clone);
 	/// Generates the texture data for a layer (for the texture database).
 	/// @param[out] texture_data The pointer to be set to the generated texture data.
 	/// @param[out] texture_dimensions The dimensions of the texture.
@@ -126,7 +130,7 @@ private:
 	};
 
 	typedef std::vector< Character* > CharacterList;
-	typedef std::vector< Texture > TextureList;
+	typedef std::vector< Texture* > TextureList;
 
 	const FontFaceHandle* handle;
 	FontEffect* effect;

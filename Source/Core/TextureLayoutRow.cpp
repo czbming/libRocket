@@ -58,7 +58,10 @@ int TextureLayoutRow::Generate(TextureLayout& layout, int max_width, int y)
 
 		// Add this glyph onto our list and mark it as placed.
 		rectangles.push_back(rectangle);
-		rectangle->Place(layout.GetNumTextures(), Vector2i(placed_width, y));
+		if (layout.has_generated)
+			rectangle->Place(layout.GetNumTextures()-1, Vector2i(placed_width, y));
+		else
+			rectangle->Place(layout.GetNumTextures(), Vector2i(placed_width, y));
 		++placed_rectangles;
 
 		// Increment our width. An extra pixel is added on so the rectangles aren't pushed up

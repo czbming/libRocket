@@ -37,6 +37,8 @@ namespace Core {
 TextureLayoutTexture::TextureLayoutTexture() : dimensions(0, 0)
 {
 	texture_data = NULL;
+	placed_height = 1;
+	is_full = false;
 }
 
 TextureLayoutTexture::~TextureLayoutTexture()
@@ -53,6 +55,47 @@ const Vector2i& TextureLayoutTexture::GetDimensions() const
 // Attempts to position unplaced rectangles from the layout into this texture.
 int TextureLayoutTexture::Generate(TextureLayout& layout, int maximum_dimensions)
 {
+	// Continue to place on this texture
+	if (layout.has_generated)
+	{
+		// Use maximum dimension if it is a newly created texture
+		if (dimensions.x == 0 || dimensions.y == 0)
+			dimensions.x = dimensions.y = maximum_dimensions;
+
+		int num_placed_rectangles = 0;
+		while (!layout.unplaced_rectangles.empty())
+		{
+			bool last_row_has_space = false;
+			const TextureLayoutRectangle* rectangle = layout.unplaced_rectangles.front();
+			if (!rows.empty() && rows.back().GetPlacedWidth() + rectangle->GetDimensions().x + 1 <= dimensions.x)
+			{
+				last_row_has_space = true;
+				placed_height -= rows.back().GetHeight() + 1;
+			}
+
+			if (placed_height + layout.max_rectangle_dimension.y + 1 > dimensions.y)
+			{
+				is_full = true;
+				break;
+			}
+
+			if (last_row_has_space)
+			{
+				TextureLayoutRow& row = rows.back();
+				num_placed_rectangles += row.Generate(layout, dimensions.x, placed_height);
+				placed_height += row.GetHeight() + 1;
+			}
+			else 
+			{
+				TextureLayoutRow row;
+				num_placed_rectangles += row.Generate(layout, dimensions.x, placed_height);
+				placed_height += row.GetHeight() + 1;
+				rows.push_back(row);
+			}
+		}
+		return num_placed_rectangles;
+	}
+
 	// Come up with an estimate for how big a texture we need. Calculate the total square pixels
 	// required by the remaining rectangles to place, square-root it to get the dimensions of the
 	// smallest texture necessary (under optimal circumstances) and round it up to the nearest
@@ -73,20 +116,18 @@ int TextureLayoutTexture::Generate(TextureLayout& layout, int maximum_dimensions
 	for (;;)
 	{
 		bool success = true;
-		int height = 1;
-
 		while (num_placed_rectangles != unplaced_rectangles)
 		{
 			TextureLayoutRow row;
-			int row_size = row.Generate(layout, dimensions.x, height);
+			int row_size = row.Generate(layout, dimensions.x, placed_height);
 			if (row_size == 0)
 			{
 				success = false;
 				break;
 			}
 
-			height += row.GetHeight() + 1;
-			if (height > dimensions.y)
+			placed_height += row.GetHeight() + 1;
+			if (placed_height > dimensions.y)
 			{
 				// D'oh! We've exceeded our height boundaries. This row should be unplaced.
 				row.Unplace();
@@ -118,7 +159,10 @@ int TextureLayoutTexture::Generate(TextureLayout& layout, int maximum_dimensions
 		else
 		{
 			if (dimensions.y << 1 > maximum_dimensions)
+			{
+				is_full = true;
 				return num_placed_rectangles;
+			}
 
 			dimensions.y <<= 1;
 		}
@@ -154,7 +198,7 @@ byte* TextureLayoutTexture::AllocateTexture()
 		for (size_t i = 0; i < rows.size(); ++i)
 			rows[i].Allocate(texture_data, dimensions.x * 4);
 	}
-
+	 
 	return texture_data;
 }
 

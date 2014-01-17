@@ -85,6 +85,7 @@ private:
 	RectangleQueue unplaced_rectangles;
 
 	Vector2i max_rectangle_dimension;
+	bool has_generated;
 
 	friend class TextureLayoutTexture;
 	friend class TextureLayoutRow;
