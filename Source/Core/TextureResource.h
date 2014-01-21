@@ -50,6 +50,8 @@ public:
 	/// succeeds now; as texture loading is now delayed until the texture is accessed by a specific
 	/// render interface, all this does is store the source.
 	bool Load(const String& source);
+	/// Dirty the texture.
+	void Update();
 
 	/// Returns the resource's underlying texture handle.
 	TextureHandle GetHandle(RenderInterface* render_interface) const;
@@ -65,6 +67,8 @@ public:
 protected:
 	/// Attempts to load the texture from the source.
 	bool Load(RenderInterface* render_interface) const;
+	/// Attempts to update the texture.
+	void Update(RenderInterface* render_interface) const;
 
 	/// Releases the texture and destroys the resource.
 	virtual void OnReferenceDeactivate();
@@ -73,6 +77,7 @@ private:
 	TextureResource();
 
 	String source;
+	mutable bool texture_dirty;
 
 	typedef std::pair< TextureHandle, Vector2i > TextureData;
 	typedef std::map< RenderInterface*, TextureData > TextureDataMap;

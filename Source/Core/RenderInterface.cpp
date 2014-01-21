@@ -69,6 +69,12 @@ bool RenderInterface::GenerateTexture(TextureHandle& ROCKET_UNUSED(texture_handl
 	return false;
 }
 
+// Called by Rocket when a texture is required to update from an internally-generated sequence of pixels.
+bool RenderInterface::UpdateTexture(TextureHandle ROCKET_UNUSED(texture_handle), const byte* ROCKET_UNUSED(source), const Vector2i& ROCKET_UNUSED(source_position), const Vector2i& ROCKET_UNUSED(source_dimensions))
+{
+	return false;
+}
+
 // Called by Rocket when a loaded texture is no longer required.
 void RenderInterface::ReleaseTexture(TextureHandle ROCKET_UNUSED(texture))
 {

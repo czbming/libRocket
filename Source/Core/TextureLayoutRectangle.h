@@ -70,7 +70,7 @@ public:
 
 	/// Returns the index of the texture this rectangle is placed on.
 	/// @return The texture index.
-	inline int GetTextureIndex();
+	inline int GetTextureIndex() const;
 	/// Returns the rectangle's allocated texture data.
 	/// @return The texture data.
 	inline byte* GetTextureData();
@@ -134,7 +134,7 @@ inline void TextureLayoutRectangle::Allocate(byte* _texture_data, int _texture_s
 }
 
 // Returns the index of the texture this rectangle is placed on.
-inline int TextureLayoutRectangle::GetTextureIndex()
+inline int TextureLayoutRectangle::GetTextureIndex() const
 {
 	return texture_index;
 }

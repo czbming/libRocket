@@ -118,25 +118,25 @@ void InputWin32::ProcessWindowsEvent(UINT message, WPARAM w_param, LPARAM l_para
 		break;
 
 		case WM_IME_COMPOSITION:
-			if(l_param & GCS_RESULTSTR) 
-			{
-				HIMC windows_context = ImmGetContext((HWND)Shell::GetWindowHandle());
-				if(windows_context == 0)
-					return;
-				size_t size = ImmGetCompositionStringW(windows_context, GCS_RESULTSTR,NULL, 0);
-				HANDLE handle = GlobalAlloc(GHND, sizeof(wchar_t) * (size + 1));
-				if(handle == 0)
-					return;
-				char* dest = (char*)GlobalLock(handle);		// UCS2
-				ImmGetCompositionStringW(windows_context, GCS_RESULTSTR, dest, size);
-				ImmReleaseContext((HWND)Shell::GetWindowHandle(), windows_context);
+		if(l_param & GCS_RESULTSTR) 
+		{
+			HIMC windows_context = ImmGetContext((HWND)Shell::GetWindowHandle());
+			if(windows_context == 0)
+				return;
+			size_t size = ImmGetCompositionStringW(windows_context, GCS_RESULTSTR,NULL, 0);
+			HANDLE handle = GlobalAlloc(GHND, sizeof(wchar_t) * (size + 1));
+			if(handle == 0)
+				return;
+			char* dest = (char*)GlobalLock(handle);		// UCS2
+			ImmGetCompositionStringW(windows_context, GCS_RESULTSTR, dest, size);
+			ImmReleaseContext((HWND)Shell::GetWindowHandle(), windows_context);
 
-				context->ProcessTextInput(Rocket::Core::WString((Rocket::Core::word*)dest, (Rocket::Core::word*)(dest+size)));
+			context->ProcessTextInput(Rocket::Core::WString((Rocket::Core::word*)dest, (Rocket::Core::word*)(dest+size)));
 
-				GlobalUnlock(handle);
-				GlobalFree(handle);
-			}
-			break;
+			GlobalUnlock(handle);
+			GlobalFree(handle);
+		}
+		break;
 
 		case WM_KEYUP:
 			context->ProcessKeyUp(key_identifier_map[w_param], GetKeyModifierState());

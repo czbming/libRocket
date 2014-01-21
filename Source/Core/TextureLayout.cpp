@@ -62,12 +62,12 @@ void TextureLayout::AddRectangle(int id, const Vector2i& dimensions)
 }
 
 // Returns one of the layout's rectangles.
-TextureLayoutRectangle& TextureLayout::GetRectangle(int index)
+TextureLayoutRectangle* TextureLayout::GetRectangle(int index)
 {
 	ROCKET_ASSERT(index >= 0);
 	ROCKET_ASSERT(index < GetNumRectangles());
 
-	return *rectangles[index];
+	return rectangles[index];
 }
 
 // Returns the number of rectangles in the layout.
@@ -77,12 +77,12 @@ int TextureLayout::GetNumRectangles() const
 }
 
 // Returns one of the layout's textures.
-TextureLayoutTexture& TextureLayout::GetTexture(int index)
+TextureLayoutTexture* TextureLayout::GetTexture(int index)
 {
 	ROCKET_ASSERT(index >= 0);
 	ROCKET_ASSERT(index < GetNumTextures());
 
-	return *textures[index];
+	return textures[index];
 }
 
 // Returns the number of textures in the layout.

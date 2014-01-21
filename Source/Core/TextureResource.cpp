@@ -29,6 +29,7 @@
 #include "TextureResource.h"
 #include "FontFaceHandle.h"
 #include "TextureDatabase.h"
+#include "TextureLayoutTexture.h"
 #include <Rocket/Core.h>
 
 namespace Rocket {
@@ -36,6 +37,7 @@ namespace Core {
 
 TextureResource::TextureResource()
 {
+	texture_dirty = false;
 }
 
 TextureResource::~TextureResource()
@@ -52,6 +54,12 @@ bool TextureResource::Load(const String& _source)
 	return true;
 }
 
+// Dirty the texture.
+void TextureResource::Update()
+{
+	texture_dirty = true;
+}
+
 // Returns the resource's underlying texture.
 TextureHandle TextureResource::GetHandle(RenderInterface* render_interface) const
 {
@@ -59,8 +67,12 @@ TextureHandle TextureResource::GetHandle(RenderInterface* render_interface) cons
 	if (texture_iterator == texture_data.end())
 	{
 		Load(render_interface);
+		texture_dirty = false;
 		texture_iterator = texture_data.find(render_interface);
 	}
+	
+	if (texture_dirty)
+		Update(render_interface);
 
 	return texture_iterator->second.first;
 }
@@ -119,36 +131,36 @@ bool TextureResource::Load(RenderInterface* render_interface) const
 	if (!source.Empty() &&
 		source[0] == '?')
 	{
-		Vector2i dimensions;
-		const byte* data = NULL;
+		Vector2i dimensions(0, 0);
+		TextureLayoutTexture* texture = NULL;
 
 		// Find the generation protocol and generate the data accordingly.
 		String protocol = source.Substring(1, source.Find("::") - 1);
 		if (protocol == "font")
 		{
 			// The requested texture is a font layer.
-			FontFaceHandle* handle;
-			FontEffect* layer_id;
-			int texture_id;
+			FontFaceHandle* handle = NULL;
+			FontEffect* layer_id = NULL;
+			int texture_id = 0;
 			
-			if (sscanf(source.CString(), "?font::%p/%p/%d", &handle, &layer_id, &texture_id) == 3)
+			if (sscanf(source.CString(), "?font::%p/%p/%d/%p", &handle, &layer_id, &texture_id, &texture) == 4)
 			{
-				handle->GenerateLayerTexture(data,
-											 dimensions,
-											 layer_id,
-											 texture_id);
+				handle->GenerateLayerTexture(layer_id, texture_id);
+				dimensions = texture->GetDimensions();
 			}
 		}
 
 		// If texture data was generated, great! Otherwise, fallback to the LoadTexture() code and
 		// hope the client knows what the hell to do with the question mark in their file name.
-		if (data != NULL)
+		if (texture && texture->GetTextureData())
 		{
 			TextureHandle handle;
-			bool success = render_interface->GenerateTexture(handle, data, dimensions);
+			bool success = render_interface->GenerateTexture(handle, texture->GetTextureData(), dimensions);
 			if (success)
 			{
 				texture_data[render_interface] = TextureData(handle, dimensions);
+				if (texture->IsFull())
+					texture->DeallocateTexture();
 				return true;
 			}
 			else
@@ -173,6 +185,47 @@ bool TextureResource::Load(RenderInterface* render_interface) const
 
 	texture_data[render_interface] = TextureData(handle, dimensions);
 	return true;
+}
+
+// Attempts to update the texture.
+void TextureResource::Update( RenderInterface* render_interface ) const
+{
+	if (!source.Empty() && source[0] == '?')
+	{
+		FontFaceHandle* handle = NULL;
+		FontEffect* layer_id = NULL;
+		int texture_id = 0;
+		TextureLayoutTexture* layout_texture = NULL;
+
+		if (sscanf(source.CString(), "?font::%p/%p/%d/%p", &handle, &layer_id, &texture_id, &layout_texture) == 4)
+		{
+			Vector2i dimensions(0, 0);
+			Vector2i position(0, 0);
+
+			handle->GenerateLayerTexture(layer_id, texture_id);
+			const byte* data = layout_texture->GetTextureData(position, dimensions);
+			if (!data)
+				return;
+
+			TextureDataMap::iterator texture_iterator = texture_data.find(render_interface);
+			if (texture_iterator != texture_data.end())
+			{
+				TextureHandle texHandle = texture_iterator->second.first;
+				bool success = render_interface->UpdateTexture(texHandle, data, position, dimensions);
+				if (success)
+				{
+					if (layout_texture->IsFull())
+						layout_texture->DeallocateTexture();
+				}
+				else
+				{
+					Log::Message(Log::LT_WARNING, "Failed to update internal texture %s.", source.CString());
+					texture_data[render_interface] = TextureData(NULL, Vector2i(0, 0));
+				}
+			}
+		}
+	}
+	texture_dirty = false;
 }
 
 void TextureResource::OnReferenceDeactivate()

@@ -265,13 +265,13 @@ int FontFaceHandle::GenerateLayerConfiguration(FontEffectMap& font_effects)
 }
 
 // Generates the texture data for a layer (for the texture database).
-bool FontFaceHandle::GenerateLayerTexture(const byte*& texture_data, Vector2i& texture_dimensions, FontEffect* layer_id, int texture_id)
+bool FontFaceHandle::GenerateLayerTexture(FontEffect* layer_id, int texture_id)
 {
 	FontLayerMap::iterator layer_iterator = layers.find(layer_id);
 	if (layer_iterator == layers.end())
 		return false;
 
-	return layer_iterator->second->GenerateTexture(texture_data, texture_dimensions, texture_id);
+	return layer_iterator->second->GenerateTexture(texture_id);
 }
 
 // Generates the geometry required to render a single line of text.
@@ -323,7 +323,6 @@ int FontFaceHandle::GenerateString(GeometryList& geometry, const WString& string
 					continue;
 				glyph = glyphs[*string_iterator];
 			}
-			
 			ROCKET_ASSERT(glyph);
 			layer->GenerateCharacter(*glyph);
 			

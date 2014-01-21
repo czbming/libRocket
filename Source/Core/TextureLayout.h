@@ -57,7 +57,7 @@ public:
 	/// Returns one of the layout's rectangles.
 	/// @param[in] index The index of the desired rectangle.
 	/// @return The desired rectangle.
-	TextureLayoutRectangle& GetRectangle(int index);
+	TextureLayoutRectangle* GetRectangle(int index);
 	/// Returns the number of rectangles in the layout.
 	/// @return The layout's rectangle count.
 	int GetNumRectangles() const;
@@ -65,7 +65,7 @@ public:
 	/// Returns one of the layout's textures.
 	/// @param[in] index The index of the desired texture.
 	/// @return The desired texture.
-	TextureLayoutTexture& GetTexture(int index);
+	TextureLayoutTexture* GetTexture(int index);
 	/// Returns the number of textures in the layout.
 	/// @return The layout's texture count.
 	int GetNumTextures() const;

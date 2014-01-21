@@ -192,28 +192,31 @@ bool FontFaceLayer::GenerateLayout()
 	int rectangle_count = texture_layout.GetNumRectangles();
 	for (int i = prior_num_rectangles; i < rectangle_count; ++i)
 	{
-		TextureLayoutRectangle& rectangle = texture_layout.GetRectangle(i);
-		Character* character = characters[(word) rectangle.GetId()];
+		TextureLayoutRectangle* rectangle = texture_layout.GetRectangle(i);
+		Character* character = characters[(word) rectangle->GetId()];
 		if (!character)
 			continue;
-		const TextureLayoutTexture& texture = texture_layout.GetTexture(rectangle.GetTextureIndex());
+		const TextureLayoutTexture* texture = texture_layout.GetTexture(rectangle->GetTextureIndex());
 
 		// Set the character's texture index.
-		character->texture_index = rectangle.GetTextureIndex();
+		character->texture_index = rectangle->GetTextureIndex();
 
 		// Generate the character's texture coordinates.
-		character->texcoords[0].x = float(rectangle.GetPosition().x) / float(texture.GetDimensions().x);
-		character->texcoords[0].y = float(rectangle.GetPosition().y) / float(texture.GetDimensions().y);
-		character->texcoords[1].x = float(rectangle.GetPosition().x + rectangle.GetDimensions().x) / float(texture.GetDimensions().x);
-		character->texcoords[1].y = float(rectangle.GetPosition().y + rectangle.GetDimensions().y) / float(texture.GetDimensions().y);
+		character->texcoords[0].x = float(rectangle->GetPosition().x) / float(texture->GetDimensions().x);
+		character->texcoords[0].y = float(rectangle->GetPosition().y) / float(texture->GetDimensions().y);
+		character->texcoords[1].x = float(rectangle->GetPosition().x + rectangle->GetDimensions().x) / float(texture->GetDimensions().x);
+		character->texcoords[1].y = float(rectangle->GetPosition().y + rectangle->GetDimensions().y) / float(texture->GetDimensions().y);
 	}
+
+	if (prior_num_textures > 0 && prior_num_rectangles != rectangle_count)
+		textures[prior_num_textures-1]->Update();
 
 	// Generate the textures.
 	int texture_count = texture_layout.GetNumTextures();
 	for (int i = prior_num_textures; i < texture_count; ++i)
 	{
 		Texture* texture = new Texture();
-		if (!texture->Load(String(64, "?font::%p/%p/%d", handle, effect, i)))
+		if (!texture->Load(String(64, "?font::%p/%p/%d/%p", handle, effect, i, texture_layout.GetTexture(i))))
 		{
 			delete texture;
 			return false;
@@ -232,7 +235,6 @@ void FontFaceLayer::CloneTexture(const FontFaceLayer* clone)
 	for (size_t i = prior_num_textures; i < clone->textures.size(); ++i)
 		textures.push_back(new Texture(*clone->textures[i]));
 
-	const FontGlyphList& glyphs = handle->GetGlyphs();
 	size_t character_count = characters.size();
 	for (size_t i = 0; i < character_count; ++i)
 	{
@@ -246,7 +248,7 @@ void FontFaceLayer::CloneTexture(const FontFaceLayer* clone)
 }
 
 // Generates the texture data for a layer (for the texture database).
-bool FontFaceLayer::GenerateTexture(const byte*& texture_data, Vector2i& texture_dimensions, int texture_id)
+bool FontFaceLayer::GenerateTexture(int texture_id)
 {
 	if (texture_id < 0 ||
 		texture_id > texture_layout.GetNumTextures())
@@ -255,25 +257,22 @@ bool FontFaceLayer::GenerateTexture(const byte*& texture_data, Vector2i& texture
 	const FontGlyphList& glyphs = handle->GetGlyphs();
 
 	// Generate the texture data.
-	texture_data = texture_layout.GetTexture(texture_id).AllocateTexture();
-	texture_dimensions = texture_layout.GetTexture(texture_id).GetDimensions();
+	TextureLayoutTexture* texture = texture_layout.GetTexture(texture_id);
+	if (texture && !texture->GetTextureData())
+		texture->AllocateTexture();
 
-	//const TextureLayoutTexture& texture = texture_layout.GetTexture(texture_id);
 	int rectangle_count = texture_layout.GetNumRectangles();
 	for (int i = 0; i < rectangle_count; ++i)
 	{
-		TextureLayoutRectangle& rectangle = texture_layout.GetRectangle(i);
-		if (!rectangle.GetTextureData())
+		TextureLayoutRectangle* rectangle = texture_layout.GetRectangle(i);
+		if (rectangle->GetTextureIndex() != texture_id)
 			continue;
 
-		Character* character = characters[(word) rectangle.GetId()];	
+		Character* character = characters[(word) rectangle->GetId()];	
 		if (!character)
 			continue;
 
-		if (character->texture_index != texture_id)
-			continue;
-
-		const FontGlyph* glyph = glyphs[rectangle.GetId()];
+		const FontGlyph* glyph = glyphs[rectangle->GetId()];
 		if (!glyph)
 			continue;
 
@@ -282,7 +281,7 @@ bool FontFaceLayer::GenerateTexture(const byte*& texture_data, Vector2i& texture
 			// Copy the glyph's bitmap data into its allocated texture.
 			if (glyph->bitmap_data != NULL)
 			{
-				byte* destination = rectangle.GetTextureData();
+				byte* destination = rectangle->GetTextureData();
 				byte* source = glyph->bitmap_data;
 
 				for (int j = 0; j < glyph->bitmap_dimensions.y; ++j)
@@ -290,14 +289,14 @@ bool FontFaceLayer::GenerateTexture(const byte*& texture_data, Vector2i& texture
 					for (int k = 0; k < glyph->bitmap_dimensions.x; ++k)
 						destination[k * 4 + 3] = source[k];
 
-					destination += rectangle.GetTextureStride();
+					destination += rectangle->GetTextureStride();
 					source += glyph->bitmap_dimensions.x;
 				}
 			}
 		}
 		else
 		{
-			effect->GenerateGlyphTexture(rectangle.GetTextureData(), Vector2i(Math::RealToInteger(character->dimensions.x), Math::RealToInteger(character->dimensions.y)), rectangle.GetTextureStride(), *glyph);
+			effect->GenerateGlyphTexture(rectangle->GetTextureData(), Vector2i(Math::RealToInteger(character->dimensions.x), Math::RealToInteger(character->dimensions.y)), rectangle->GetTextureStride(), *glyph);
 		}
 	}
 

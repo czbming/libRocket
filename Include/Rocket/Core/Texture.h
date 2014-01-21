@@ -57,6 +57,8 @@ public:
 	/// @param[in] source_path The path of the resource that is requesting the texture (ie, the RCSS file in which it was specified, etc).
 	/// @return True if the texture loaded successfully, false if not.
 	bool Load(const String& source, const String& source_path = "");
+	/// Attempts to update the texture.
+	void Update();
 
 	/// Returns the texture's source name. This is usually the name of the file the texture was loaded from.
 	/// @return The name of the this texture's source. This will be the empty string if this texture is not loaded.

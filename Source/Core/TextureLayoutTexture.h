@@ -62,12 +62,13 @@ public:
 	int Generate(TextureLayout& layout, int maximum_dimensions);
 
 	/// Allocates the texture.
-	/// @return The allocated texture data.
-	byte* AllocateTexture();
+	void AllocateTexture();
 	/// Deallocate the texture.
 	void DeallocateTexture();
 
 	inline bool IsFull() const;
+	inline const byte* GetTextureData() const;
+	const byte* GetTextureData(Vector2i& offset_position, Vector2i& sub_dimensions) const;
 
 private:
 	typedef std::vector< TextureLayoutRow > RowList;
@@ -77,12 +78,18 @@ private:
 
 	byte* texture_data;
 	int placed_height;
+	mutable int prior_placed_height;
 	bool is_full;
 };
 
 inline bool TextureLayoutTexture::IsFull() const
 {
 	return is_full;
+}
+
+inline const byte* TextureLayoutTexture::GetTextureData() const
+{
+	return texture_data;
 }
 
 }
