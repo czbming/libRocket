@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		384BD57C18910D7400FCB666 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E8B1DCF123ABA2200C451C8 /* libz.dylib */; };
+		384BD58018910F4000FCB666 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 384BD57F18910F4000FCB666 /* libz.dylib */; };
 		6E2C557416AA3EA9007E581B /* ElementStyle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6E2C557016AA3EA9007E581B /* ElementStyle.cpp */; };
 		6E2C557516AA3EA9007E581B /* ElementStyle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6E2C557016AA3EA9007E581B /* ElementStyle.cpp */; };
 		6E2C557616AA3EA9007E581B /* ElementStyle.h in Headers */ = {isa = PBXBuildFile; fileRef = 6E2C557116AA3EA9007E581B /* ElementStyle.h */; };
@@ -53,7 +55,6 @@
 		6E8B1CF8123AB0CC00C451C8 /* XMLNodeHandlerTextArea.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6E8B1C70123AB0CC00C451C8 /* XMLNodeHandlerTextArea.cpp */; };
 		6E8B1DC3123AB7A500C451C8 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E8B1DC2123AB7A500C451C8 /* libfreetype.a */; };
 		6E8B1DE1123ABCA200C451C8 /* libfreetype.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E8B1DC2123AB7A500C451C8 /* libfreetype.a */; };
-		6E8B1DE2123ABCA200C451C8 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 6E8B1DD1123ABA3A00C451C8 /* libz.dylib */; };
 		6E8B1DE3123ABCC200C451C8 /* BaseXMLParser.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6E9D09261209823B00099E1A /* BaseXMLParser.cpp */; };
 		6E8B1DE4123ABCC200C451C8 /* Box.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6EF28B78120580DA000FAF17 /* Box.cpp */; };
 		6E8B1DE5123ABCC200C451C8 /* Clock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 6EF28D0312058A45000FAF17 /* Clock.cpp */; };
@@ -503,6 +504,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		384BD57F18910F4000FCB666 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = ../../../../MacOSX.platform/Developer/SDKs/MacOSX10.9.sdk/usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		6E2C557016AA3EA9007E581B /* ElementStyle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ElementStyle.cpp; path = ../Source/Core/ElementStyle.cpp; sourceTree = "<group>"; };
 		6E2C557116AA3EA9007E581B /* ElementStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ElementStyle.h; path = ../Source/Core/ElementStyle.h; sourceTree = "<group>"; };
 		6E2C557216AA3EA9007E581B /* ElementStyleCache.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ElementStyleCache.cpp; path = ../Source/Core/ElementStyleCache.cpp; sourceTree = "<group>"; };
@@ -565,7 +567,6 @@
 		6E8B1C71123AB0CC00C451C8 /* XMLNodeHandlerTextArea.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = XMLNodeHandlerTextArea.h; path = ../Source/Controls/XMLNodeHandlerTextArea.h; sourceTree = SOURCE_ROOT; };
 		6E8B1DC2123AB7A500C451C8 /* libfreetype.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype.a; path = ../../support/lib/libfreetype.a; sourceTree = SOURCE_ROOT; };
 		6E8B1DCF123ABA2200C451C8 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		6E8B1DD1123ABA3A00C451C8 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
 		6E8B1DDC123ABC7800C451C8 /* RocketCoreOSX.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RocketCoreOSX.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		6E8B1DDD123ABC7800C451C8 /* RocketCoreOSX-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "RocketCoreOSX-Info.plist"; sourceTree = "<group>"; };
 		6E8B1E6B123ABCEF00C451C8 /* RocketControlsOSX.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = RocketControlsOSX.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -830,8 +831,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				384BD58018910F4000FCB666 /* libz.dylib in Frameworks */,
 				6E8B1DE1123ABCA200C451C8 /* libfreetype.a in Frameworks */,
-				6E8B1DE2123ABCA200C451C8 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -863,6 +864,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6E8B1DC3123AB7A500C451C8 /* libfreetype.a in Frameworks */,
+				384BD57C18910D7400FCB666 /* libz.dylib in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1207,16 +1209,16 @@
 			children = (
 				6E8B1EC6123AC80700C451C8 /* RocketDebuggerOSX.framework */,
 				6E8B1EC7123AC80700C451C8 /* RocketDebuggerOSX-Info.plist */,
-				6E8B1EBC123AC7A200C451C8 /* libRocketDebuggeriOS.a */,
 				6E8B1DDC123ABC7800C451C8 /* RocketCoreOSX.framework */,
 				6E8B1DDD123ABC7800C451C8 /* RocketCoreOSX-Info.plist */,
 				6E8B1E6B123ABCEF00C451C8 /* RocketControlsOSX.framework */,
 				6E8B1E6C123ABCEF00C451C8 /* RocketControlsOSX-Info.plist */,
 				6E8B1DCF123ABA2200C451C8 /* libz.dylib */,
-				6E8B1DD1123ABA3A00C451C8 /* libz.dylib */,
+				384BD57F18910F4000FCB666 /* libz.dylib */,
 				6E8B1DC2123AB7A500C451C8 /* libfreetype.a */,
 				6E8B1BF0123AAEE200C451C8 /* libRocketControlsiOS.a */,
 				6E8B1B0C123A0E2A00C451C8 /* libRocketCoreiOS.a */,
+				6E8B1EBC123AC7A200C451C8 /* libRocketDebuggeriOS.a */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1476,6 +1478,8 @@
 /* Begin PBXProject section */
 		0867D690FE84028FC02AAC07 /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+			};
 			buildConfigurationList = 1DEB922208733DC00010E9CD /* Build configuration list for PBXProject "Rocket" */;
 			compatibilityVersion = "Xcode 3.1";
 			developmentRegion = English;
