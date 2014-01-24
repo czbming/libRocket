@@ -33,7 +33,7 @@
 namespace Rocket {
 namespace Core {
 
-TextureLayout::TextureLayout()
+TextureLayout::TextureLayout() : max_rectangle_dimension(0, 0)
 {
 	has_generated = false;
 }
