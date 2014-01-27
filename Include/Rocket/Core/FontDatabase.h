@@ -76,6 +76,8 @@ public:
 	/// @param[in] weight The weight of the face (normal or bold).
 	/// @return True if the face was loaded successfully, false otherwise.
 	static bool LoadFontFace(const byte* data, int data_length, const String& family, Font::Style style, Font::Weight weight);
+	/// Deletes a font face from the database.
+	static void UnloadFontFace(const String& family);
 
 	/// Returns a handle to a font face that can be used to position and render text. This will return the closest match
 	/// it can find, but in the event a font family is requested that does not exist, NULL will be returned instead of a

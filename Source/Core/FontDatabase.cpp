@@ -183,6 +183,17 @@ bool FontDatabase::LoadFontFace(const byte* data, int data_length, const String&
 	}
 }
 
+// Deletes a font face from the database.
+void FontDatabase::UnloadFontFace( const String& family )
+{
+	FontFamilyMap::iterator i = instance->font_families.find(family);
+	if (i != instance->font_families.end())
+	{
+		delete i->second;
+		instance->font_families.erase(i);
+	}
+}
+
 // Returns a handle to a font face that can be used to position and render text.
 FontFaceHandle* FontDatabase::GetFontFaceHandle(const String& family, const String& charset, Font::Style style, Font::Weight weight, int size)
 {
