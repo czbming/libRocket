@@ -220,7 +220,7 @@ void TextureResource::Update( RenderInterface* render_interface ) const
 				else
 				{
 					Log::Message(Log::LT_WARNING, "Failed to update internal texture %s.", source.CString());
-					texture_data[render_interface] = TextureData(NULL, Vector2i(0, 0));
+					texture_data[render_interface] = TextureData(0, Vector2i(0, 0));
 				}
 			}
 		}
