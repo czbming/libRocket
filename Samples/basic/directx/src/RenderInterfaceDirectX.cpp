@@ -285,6 +285,32 @@ bool RenderInterfaceDirectX::GenerateTexture(Rocket::Core::TextureHandle& textur
 	return true;
 }
 
+// Called by Rocket when a texture is required to update from an internally-generated sequence of pixels.
+bool RenderInterfaceDirectX::UpdateTexture(Rocket::Core::TextureHandle texture_handle, const byte* source, const Rocket::Core::Vector2i& source_position, const Rocket::Core::Vector2i& source_dimensions)
+{
+	LPDIRECT3DTEXTURE9 d3d9_texture = (LPDIRECT3DTEXTURE9)texture_handle;
+
+	// Lock the top surface and write the pixel data onto it.
+	D3DLOCKED_RECT locked_rect;
+	d3d9_texture->LockRect(0, &locked_rect, NULL, 0);
+	for (int y = 0; y < source_dimensions.y; ++y)
+	{
+		for (int x = source_position.x; x < source_dimensions.x; ++x)
+		{
+			const byte* source_pixel = source + (source_dimensions.x * 4 * y) + (x * 4);
+			byte* destination_pixel = ((byte*) locked_rect.pBits) + locked_rect.Pitch * (source_position.y + y) + x * 4;
+
+			destination_pixel[0] = source_pixel[2];
+			destination_pixel[1] = source_pixel[1];
+			destination_pixel[2] = source_pixel[0];
+			destination_pixel[3] = source_pixel[3];
+		}
+	}
+	d3d9_texture->UnlockRect(0);
+
+	return true;
+}
+
 // Called by Rocket when a loaded texture is no longer required.
 void RenderInterfaceDirectX::ReleaseTexture(Rocket::Core::TextureHandle texture_handle)
 {
@@ -302,4 +328,3 @@ float RenderInterfaceDirectX::GetVerticalTexelOffset()
 {
 	return -0.5f;
 }
-
