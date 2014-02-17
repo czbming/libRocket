@@ -55,13 +55,22 @@ FontFaceHandle::FontFaceHandle()
 	underline_position = 0;
 	underline_thickness = 0;
 
+	ft_face = NULL;
+
 	base_layer = NULL;
 }
 
 FontFaceHandle::~FontFaceHandle()
 {
 	for (FontGlyphList::iterator i = glyphs.begin(); i != glyphs.end(); ++i)
-		delete[] i->bitmap_data;
+    {
+		FontGlyph* glyph = *i;
+		if (glyph)
+		{
+			delete[] glyph->bitmap_data;
+			delete glyph;
+		}
+    }
 
 	for (FontLayerMap::iterator i = layers.begin(); i != layers.end(); ++i)
 		delete i->second;
@@ -87,26 +96,35 @@ bool FontFaceHandle::Initialise(FT_Face ft_face, const String& _charset, int _si
 		return false;
 	}
 
+	this->ft_face = ft_face;
+
 	// find the maximum character we are interested in
 	max_codepoint = 0;
 	for (size_t i = 0; i < charset.size(); ++i)
 		max_codepoint = Math::Max(max_codepoint, charset[i].max_codepoint);
 
 	// Construct the list of the characters specified by the charset.
-	glyphs.resize(max_codepoint+1, FontGlyph());
-	for (size_t i = 0; i < charset.size(); ++i)
-		BuildGlyphMap(ft_face, charset[i]);
+	glyphs.resize(max_codepoint+1, NULL);
+
+	// Prebuild charset list except the last one
+	size_t charset_count = charset.size();
+	if (charset_count > 1)
+		--charset_count;
+	for (size_t i = 0; i < charset_count; ++i)
+	{
+		for (word character_code = (word) (Math::Max< unsigned int >(charset[i].min_codepoint, 32)); character_code <= charset[i].max_codepoint; ++character_code)
+		{
+			BuildGlyph(character_code);
+		}
+	}
 
 	// Generate the metrics for the handle.
-	GenerateMetrics(ft_face);
-
-	BuildKerning(ft_face);
+	GenerateMetrics();
 
 	// Generate the default layer and layer configuration.
 	base_layer = GenerateLayer(NULL);
 	layer_configurations.push_back(LayerConfiguration());
 	layer_configurations.back().push_back(base_layer);
-
 
 	return true;
 }
@@ -152,19 +170,22 @@ int FontFaceHandle::GetStringWidth(const WString& string, word prior_character) 
 {
 	int width = 0;
 
+	size_t glyph_count = glyphs.size();
 	for (size_t i = 0; i < string.Length(); i++)
 	{
 		word character_code = string[i];
 
-		if (character_code >= glyphs.size())
+		if (character_code >= glyph_count)
 			continue;
-		const FontGlyph &glyph = glyphs[character_code];
+		const FontGlyph* glyph = glyphs[character_code];
+        if (!glyph)
+			continue;
 
 		// Adjust the cursor for the kerning between this character and the previous one.
 		if (prior_character != 0)
 			width += GetKerning(prior_character, string[i]);
 		// Adjust the cursor for this character's advance.
-		width += glyph.advance;
+		width += glyph->advance;
 
 		prior_character = character_code;
 	}
@@ -244,23 +265,24 @@ int FontFaceHandle::GenerateLayerConfiguration(FontEffectMap& font_effects)
 }
 
 // Generates the texture data for a layer (for the texture database).
-bool FontFaceHandle::GenerateLayerTexture(const byte*& texture_data, Vector2i& texture_dimensions, FontEffect* layer_id, int texture_id)
+bool FontFaceHandle::GenerateLayerTexture(FontEffect* layer_id, int texture_id)
 {
 	FontLayerMap::iterator layer_iterator = layers.find(layer_id);
 	if (layer_iterator == layers.end())
 		return false;
 
-	return layer_iterator->second->GenerateTexture(texture_data, texture_dimensions, texture_id);
+	return layer_iterator->second->GenerateTexture(texture_id);
 }
 
 // Generates the geometry required to render a single line of text.
-int FontFaceHandle::GenerateString(GeometryList& geometry, const WString& string, const Vector2f& position, const Colourb& colour, int layer_configuration_index) const
+int FontFaceHandle::GenerateString(GeometryList& geometry, const WString& string, const Vector2f& position, const Colourb& colour, int layer_configuration_index)
 {
 	int geometry_index = 0;
 	int line_width = 0;
 
 	ROCKET_ASSERT(layer_configuration_index >= 0);
 	ROCKET_ASSERT(layer_configuration_index < (int) layer_configurations.size());
+	int glyph_count = glyphs.size();
 
 	// Fetch the requested configuration and generate the geometry for each one.
 	const LayerConfiguration& layer_configuration = layer_configurations[layer_configuration_index];
@@ -275,36 +297,90 @@ int FontFaceHandle::GenerateString(GeometryList& geometry, const WString& string
 			layer_colour = layer->GetColour();
 
 		// Resize the geometry list if required.
-		if ((int) geometry.size() < geometry_index + layer->GetNumTextures())
-			geometry.resize(geometry_index + layer->GetNumTextures());
+		int num_textures = layer->GetNumTextures();
+		if ((int) geometry.size() < geometry_index + num_textures)
+			geometry.resize(geometry_index + num_textures);
 
 		// Bind the textures to the geometries.
-		for (int i = 0; i < layer->GetNumTextures(); ++i)
+		for (int i = 0; i < num_textures; ++i)
 			geometry[geometry_index + i].SetTexture(layer->GetTexture(i));
+
+		WString valid_string(string.Length(), 0);
+		int valid_string_length = 0;
+		const word* string_iterator = string.CString();
+		const word* string_end = string.CString() + string.Length();
+
+		// Dynamic build glyph and generate character
+		for (; string_iterator != string_end; string_iterator++)
+		{
+			if (*string_iterator >= glyph_count)
+				continue;
+
+			const FontGlyph* glyph = glyphs[*string_iterator];
+			if (!glyph)
+			{
+				if (!BuildGlyph(*string_iterator))
+					continue;
+				glyph = glyphs[*string_iterator];
+			}
+			ROCKET_ASSERT(glyph);
+			layer->GenerateCharacter(*glyph);
+			
+			valid_string[valid_string_length] = *string_iterator;
+			valid_string_length++;
+		}
+		valid_string.Resize(valid_string_length);
+
+		// Generate texture layout base on the newly generated characters.
+		const FontEffect* effect = layer->GetFontEffect();
+		if (!effect || effect->HasUniqueTexture())
+		{
+			// Base layer or outline effect layer
+			layer->GenerateLayout();
+		}
+		else if (layer_configuration[0] != base_layer)
+		{
+			// Shadow effect layer, reference the base layer's texture.
+			string_iterator = valid_string.CString();
+			string_end = valid_string.CString() + valid_string.Length();
+
+			for (; string_iterator != string_end; string_iterator++)
+				base_layer->GenerateCharacter(*glyphs[*string_iterator]);
+			base_layer->GenerateLayout();
+			layer->CloneTexture(base_layer);
+		}
+
+		if (num_textures < layer->GetNumTextures())
+		{
+			for (int i = num_textures; i < layer->GetNumTextures(); ++i)
+			{
+				Geometry geom;
+				geom.SetTexture(layer->GetTexture(i));
+				geometry.insert(geometry.begin()+geometry_index+i, geom);
+			}
+			num_textures = layer->GetNumTextures();
+		}
 
 		line_width = 0;
 		word prior_character = 0;
 
-		const word* string_iterator = string.CString();
-		const word* string_end = string.CString() + string.Length();
+		// Generate geometry
+		string_iterator = valid_string.CString();
+		string_end = valid_string.CString() + valid_string.Length();
 
 		for (; string_iterator != string_end; string_iterator++)
 		{
-			if (*string_iterator >= glyphs.size())
-				continue;
-			const FontGlyph &glyph = glyphs[*string_iterator];
-
 			// Adjust the cursor for the kerning between this character and the previous one.
 			if (prior_character != 0)
 				line_width += GetKerning(prior_character, *string_iterator);
 
 			layer->GenerateGeometry(&geometry[geometry_index], *string_iterator, Vector2f(position.x + line_width, position.y), layer_colour);
 
-			line_width += glyph.advance;
-			prior_character = *string_iterator;
+			line_width += glyphs[*string_iterator]->advance;
+			prior_character = *string_iterator; 
 		}
 
-		geometry_index += layer->GetNumTextures();
+		geometry_index += num_textures;
 	}
 
 	// Cull any excess geometry from a previous generation.
@@ -351,7 +427,7 @@ void FontFaceHandle::OnReferenceDeactivate()
 	delete this;
 }
 
-void FontFaceHandle::GenerateMetrics(FT_Face ft_face)
+void FontFaceHandle::GenerateMetrics()
 {
 	line_height = ft_face->size->metrics.height >> 6;
 	baseline = line_height - (ft_face->size->metrics.ascender >> 6);
@@ -364,9 +440,10 @@ void FontFaceHandle::GenerateMetrics(FT_Face ft_face)
 	unsigned int num_visible_glyphs = 0;
 	for (FontGlyphList::iterator i = glyphs.begin(); i != glyphs.end(); ++i)
 	{
-		if (i->advance)
+		const FontGlyph* glyph = *i;
+		if (glyph && glyph->advance)
 		{
-			average_advance += i->advance;
+			average_advance += glyph->advance;
 			num_visible_glyphs++;
 		}
 	}
@@ -384,33 +461,31 @@ void FontFaceHandle::GenerateMetrics(FT_Face ft_face)
 		x_height = 0;
 }
 
-void FontFaceHandle::BuildGlyphMap(FT_Face ft_face, const UnicodeRange& unicode_range)
+bool FontFaceHandle::BuildGlyph( word character_code )
 {
-	for (word character_code = (word) (Math::Max< unsigned int >(unicode_range.min_codepoint, 32)); character_code <= unicode_range.max_codepoint; ++character_code)
+	int index = FT_Get_Char_Index(ft_face, character_code);
+	if (index == 0)
+		return false;
+
+	FT_Error error = FT_Load_Glyph(ft_face, index, 0);
+	if (error != 0)
 	{
-		int index = FT_Get_Char_Index(ft_face, character_code);
-		if (index != 0)
-		{
-			FT_Error error = FT_Load_Glyph(ft_face, index, 0);
-			if (error != 0)
-			{
-				Log::Message(Log::LT_WARNING, "Unable to load glyph for character '%u' on the font face '%s %s'; error code: %d.", character_code, ft_face->family_name, ft_face->style_name, error);
-				continue;
-			}
-
-			error = FT_Render_Glyph(ft_face->glyph, FT_RENDER_MODE_NORMAL);
-			if (error != 0)
-			{
-				Log::Message(Log::LT_WARNING, "Unable to render glyph for character '%u' on the font face '%s %s'; error code: %d.", character_code, ft_face->family_name, ft_face->style_name, error);
-				continue;
-			}
-
-			FontGlyph glyph;
-			glyph.character = character_code;
-			BuildGlyph(glyph, ft_face->glyph);
-			glyphs[character_code] = glyph;
-		}
+		Log::Message(Log::LT_WARNING, "Unable to load glyph for character '%u' on the font face '%s %s'; error code: %d.", character_code, ft_face->family_name, ft_face->style_name, error);
+		return false;
 	}
+
+	error = FT_Render_Glyph(ft_face->glyph, FT_RENDER_MODE_NORMAL);
+	if (error != 0)
+	{
+		Log::Message(Log::LT_WARNING, "Unable to render glyph for character '%u' on the font face '%s %s'; error code: %d.", character_code, ft_face->family_name, ft_face->style_name, error);
+		return false;
+	}
+
+	FontGlyph* glyph = new FontGlyph;
+	glyph->character = character_code;
+	BuildGlyph(*glyph, ft_face->glyph);
+	glyphs[character_code] = glyph;
+	return true;
 }
 
 void FontFaceHandle::BuildGlyph(FontGlyph& glyph, FT_GlyphSlot ft_glyph)
@@ -496,48 +571,22 @@ void FontFaceHandle::BuildGlyph(FontGlyph& glyph, FT_GlyphSlot ft_glyph)
 		glyph.bitmap_data = NULL;
 }
 
-void FontFaceHandle::BuildKerning(FT_Face ft_face)
-{
-	// Compile the kerning information for this character if the font includes it.
-	if (FT_HAS_KERNING(ft_face))
-	{
-		kerning.resize(max_codepoint+1, GlyphKerningList(max_codepoint+1, 0));
-
-		for (size_t i = 0; i < charset.size(); ++i)
-		{
-			for (word rhs = (word) (Math::Max< unsigned int >(charset[i].min_codepoint, 32)); rhs <= charset[i].max_codepoint; ++rhs)
-			{
-				GlyphKerningList glyph_kerning(max_codepoint+1, 0);
-
-				for (size_t j = 0; j < charset.size(); ++j)
-				{
-					for (word lhs = (word) (Math::Max< unsigned int >(charset[j].min_codepoint, 32)); lhs <= charset[j].max_codepoint; ++lhs)
-					{
-						FT_Vector ft_kerning;
-						FT_Get_Kerning(ft_face, FT_Get_Char_Index(ft_face, lhs), FT_Get_Char_Index(ft_face, rhs), FT_KERNING_DEFAULT, &ft_kerning);
-
-						int kerning = ft_kerning.x >> 6;
-						if (kerning != 0)
-							glyph_kerning[lhs] = kerning;
-					}
-				}
-
-				kerning[rhs] = glyph_kerning;
-			}
-		}
-	}
-}
-
 int FontFaceHandle::GetKerning(word lhs, word rhs) const
 {
-	if (rhs >= kerning.size())
+	if (!FT_HAS_KERNING(ft_face))
 		return 0;
 
-	const GlyphKerningList &kerning_map = kerning[rhs];
-	if (lhs >= kerning_map.size())
+	FT_Vector ft_kerning;
+
+	FT_Error ft_error = FT_Get_Kerning(ft_face, 
+		FT_Get_Char_Index(ft_face, lhs), FT_Get_Char_Index(ft_face, rhs),
+		FT_KERNING_DEFAULT, &ft_kerning);
+
+	if (ft_error != 0)
 		return 0;
 
-	return kerning_map[lhs];
+	int kerning = ft_kerning.x >> 6;
+	return kerning;
 }
 
 // Generates (or shares) a layer derived from a font effect.

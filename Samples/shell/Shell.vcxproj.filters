@@ -66,6 +66,9 @@
     <ClCompile Include="src\ShellFileInterface.cpp">
       <Filter>File</Filter>
     </ClCompile>
+    <ClCompile Include="src\macosx\InputMacOSX.cpp">
+      <Filter>Input\macosx</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="include\Shell.h">
@@ -88,6 +91,12 @@
     </ClInclude>
     <ClInclude Include="include\ShellFileInterface.h">
       <Filter>File</Filter>
+    </ClInclude>
+    <ClInclude Include="include\macosx\InputMacOSX.h">
+      <Filter>Input\macosx</Filter>
+    </ClInclude>
+    <ClInclude Include="include\x11\InputX11.h">
+      <Filter>Input\x11</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -101,6 +101,8 @@ public:
 	/// @param[in] source_dimensions The dimensions, in pixels, of the source data.
 	/// @return True if the texture generation succeeded and the handle is valid, false if not.
 	virtual bool GenerateTexture(TextureHandle& texture_handle, const byte* source, const Vector2i& source_dimensions);
+	/// Called by Rocket when a texture is required to update from an internally-generated sequence of pixels.
+	virtual bool UpdateTexture(TextureHandle texture_handle, const byte* source, const Vector2i& source_position, const Vector2i& source_dimensions);
 	/// Called by Rocket when a loaded texture is no longer required.
 	/// @param texture The texture handle to release.
 	virtual void ReleaseTexture(TextureHandle texture);

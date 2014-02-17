@@ -66,7 +66,7 @@ public:
 	Vector2i bitmap_dimensions;
 };
 
-typedef std::vector< FontGlyph > FontGlyphList;
+typedef std::vector< FontGlyph* > FontGlyphList;
 
 }
 }

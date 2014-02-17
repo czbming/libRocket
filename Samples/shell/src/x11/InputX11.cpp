@@ -131,6 +131,9 @@ void InputX11::ProcessXEvent(Display* display, const XEvent& event)
 				context->ProcessKeyUp(key_identifier, key_modifier_state);
 		}
 		break;
+
+		default:
+			break;
 	}
 }
 

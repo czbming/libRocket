@@ -54,28 +54,32 @@ public:
 
 	/// Adds a new font face to the database. The face's family, style and weight will be determined from the face itself.
 	/// @param[in] file_name The file to load the face from.
+	/// @param[in] face_index The index of the font face.
 	/// @return True if the face was loaded successfully, false otherwise.
-	static bool LoadFontFace(const String& file_name);
+	static bool LoadFontFace(const String& file_name, int face_index = 0);
 	/// Adds a new font face to the database, ignoring any family, style and weight information stored in the face itself.
 	/// @param[in] file_name The file to load the face from.
-	/// @param[in] family The family to add the face to.
 	/// @param[in] style The style of the face (normal or italic).
 	/// @param[in] weight The weight of the face (normal or bold).
+	/// @param[in] face_index The index of the font face.
 	/// @return True if the face was loaded successfully, false otherwise.
-	static bool LoadFontFace(const String& file_name, const String& family, Font::Style style, Font::Weight weight);
+	static bool LoadFontFace(const String& file_name, Font::Style style, Font::Weight weight, int face_index = 0);
 	/// Adds a new font face to the database, loading from memory. The face's family, style and weight will be determined from the face itself.
 	/// @param[in] data The font data.
 	/// @param[in] data_length Length of the data.
+	/// @param[in] face_index The index of the font face.
 	/// @return True if the face was loaded successfully, false otherwise.
-	static bool LoadFontFace(const byte* data, int data_length);
+	static bool LoadFontFace(const byte* data, int data_length, int face_index = 0);
 	/// Adds a new font face to the database, loading from memory.
 	/// @param[in] data The font data.
 	/// @param[in] data_length Length of the data.
-	/// @param[in] family The family to add the face to.
 	/// @param[in] style The style of the face (normal or italic).
 	/// @param[in] weight The weight of the face (normal or bold).
+	/// @param[in] face_index The index of the font face.
 	/// @return True if the face was loaded successfully, false otherwise.
-	static bool LoadFontFace(const byte* data, int data_length, const String& family, Font::Style style, Font::Weight weight);
+	static bool LoadFontFace(const byte* data, int data_length, Font::Style style, Font::Weight weight, int face_index = 0);
+	/// Removes a font face from the database.
+	static void UnloadFontFace(const String& family);
 
 	/// Returns a handle to a font face that can be used to position and render text. This will return the closest match
 	/// it can find, but in the event a font family is requested that does not exist, NULL will be returned instead of a
@@ -106,9 +110,9 @@ private:
 	// Adds a loaded face to the appropriate font family.
 	bool AddFace(void* face, const String& family, Font::Style style, Font::Weight weight, bool release_stream);
 	// Loads a FreeType face.
-	void* LoadFace(const String& file_name);
+	void* LoadFace(const String& file_name, int face_index);
 	// Loads a FreeType face from memory.
-	void* LoadFace(const byte* data, int data_length, const String& source, bool local_data);
+	void* LoadFace(const byte* data, int data_length, const String& source, bool local_data, int face_index);
 
 	typedef std::map< String, FontFamily*, StringUtilities::StringComparei > FontFamilyMap;
 	FontFamilyMap font_families;

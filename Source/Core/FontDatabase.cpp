@@ -90,9 +90,9 @@ void FontDatabase::Shutdown()
 }
 
 // Loads a new font face.
-bool FontDatabase::LoadFontFace(const String& file_name)
+bool FontDatabase::LoadFontFace(const String& file_name, int face_index)
 {
-	FT_Face ft_face = (FT_Face) instance->LoadFace(file_name);
+	FT_Face ft_face = (FT_Face) instance->LoadFace(file_name, face_index);
 	if (ft_face == NULL)
 	{
 		Log::Message(Log::LT_ERROR, "Failed to load font face from %s.", file_name.CString());
@@ -115,16 +115,16 @@ bool FontDatabase::LoadFontFace(const String& file_name)
 }
 
 // Adds a new font face to the database, ignoring any family, style and weight information stored in the face itself.
-bool FontDatabase::LoadFontFace(const String& file_name, const String& family, Font::Style style, Font::Weight weight)
+bool FontDatabase::LoadFontFace(const String& file_name, Font::Style style, Font::Weight weight, int face_index)
 {
-	FT_Face ft_face = (FT_Face) instance->LoadFace(file_name);
+	FT_Face ft_face = (FT_Face) instance->LoadFace(file_name, face_index);
 	if (ft_face == NULL)
 	{
 		Log::Message(Log::LT_ERROR, "Failed to load font face from %s.", file_name.CString());
 		return false;
 	}
 
-	if (instance->AddFace(ft_face, family, style, weight, true))
+	if (instance->AddFace(ft_face, ft_face->family_name, style, weight, true))
 	{
 		Log::Message(Log::LT_INFO, "Loaded font face %s %s (from %s).", ft_face->family_name, ft_face->style_name, file_name.CString());
 		return true;
@@ -137,9 +137,9 @@ bool FontDatabase::LoadFontFace(const String& file_name, const String& family, F
 }
 
 // Adds a new font face to the database, loading from memory.
-bool FontDatabase::LoadFontFace(const byte* data, int data_length)
+bool FontDatabase::LoadFontFace(const byte* data, int data_length, int face_index)
 {
-	FT_Face ft_face = (FT_Face) instance->LoadFace(data, data_length, "memory", false);
+	FT_Face ft_face = (FT_Face) instance->LoadFace(data, data_length, "memory", false, face_index);
 	if (ft_face == NULL)
 	{
 		Log::Message(Log::LT_ERROR, "Failed to load font face from byte stream.");
@@ -162,16 +162,16 @@ bool FontDatabase::LoadFontFace(const byte* data, int data_length)
 }
 
 // Adds a new font face to the database, loading from memory, ignoring any family, style and weight information stored in the face itself.
-bool FontDatabase::LoadFontFace(const byte* data, int data_length, const String& family, Font::Style style, Font::Weight weight)
+bool FontDatabase::LoadFontFace(const byte* data, int data_length, Font::Style style, Font::Weight weight, int face_index)
 {
-	FT_Face ft_face = (FT_Face) instance->LoadFace(data, data_length, "memory", false);
+	FT_Face ft_face = (FT_Face) instance->LoadFace(data, data_length, "memory", false, face_index);
 	if (ft_face == NULL)
 	{
 		Log::Message(Log::LT_ERROR, "Failed to load font face from byte stream.");
 		return false;
 	}
 
-	if (instance->AddFace(ft_face, family, style, weight, false))
+	if (instance->AddFace(ft_face, ft_face->family_name, style, weight, false))
 	{
 		Log::Message(Log::LT_INFO, "Loaded font face %s %s (from byte stream).", ft_face->family_name, ft_face->style_name);
 		return true;
@@ -180,6 +180,17 @@ bool FontDatabase::LoadFontFace(const byte* data, int data_length, const String&
 	{
 		Log::Message(Log::LT_ERROR, "Failed to load font face %s %s (from byte stream).", ft_face->family_name, ft_face->style_name);
 		return false;
+	}
+}
+
+// Removes a font face from the database.
+void FontDatabase::UnloadFontFace( const String& family )
+{
+	FontFamilyMap::iterator i = instance->font_families.find(family);
+	if (i != instance->font_families.end())
+	{
+		delete i->second;
+		instance->font_families.erase(i);
 	}
 }
 
@@ -272,7 +283,7 @@ bool FontDatabase::AddFace(void* face, const String& family, Font::Style style, 
 }
 
 // Loads a FreeType face.
-void* FontDatabase::LoadFace(const String& file_name)
+void* FontDatabase::LoadFace(const String& file_name, int face_index)
 {
 	FileInterface* file_interface = GetFileInterface();
 	FileHandle handle = file_interface->Open(file_name);
@@ -288,17 +299,17 @@ void* FontDatabase::LoadFace(const String& file_name)
 	file_interface->Read(buffer, length, handle);
 	file_interface->Close(handle);
 
-	return LoadFace(buffer, length, file_name, true);
+	return LoadFace(buffer, length, file_name, true, face_index);
 }
 
 // Loads a FreeType face from memory.
-void* FontDatabase::LoadFace(const byte* data, int data_length, const String& source, bool local_data)
+void* FontDatabase::LoadFace(const byte* data, int data_length, const String& source, bool local_data, int face_index)
 {
 	FT_Face face = NULL;
-	int error = FT_New_Memory_Face(ft_library, (const FT_Byte*) data, data_length, 0, &face);
+	int error = FT_New_Memory_Face(ft_library, (const FT_Byte*) data, data_length, face_index, &face);
 	if (error != 0)
 	{
-		Log::Message(Log::LT_ERROR, "FreeType error %d while loading face from %s.", error, source.CString());
+		Log::Message(Log::LT_ERROR, "FreeType error %d while loading face with the index %d from %s.", error, face_index, source.CString());
 		if (local_data)
 			delete[] data;
 

@@ -216,6 +216,15 @@ bool ShellRenderInterfaceOpenGL::GenerateTexture(Rocket::Core::TextureHandle& te
 	return true;
 }
 
+// Called by Rocket when a texture is required to update from an internally-generated sequence of pixels.
+bool ShellRenderInterfaceOpenGL::UpdateTexture( Rocket::Core::TextureHandle texture_handle, const Rocket::Core::byte* source, const Rocket::Core::Vector2i& source_position, const Rocket::Core::Vector2i& source_dimensions )
+{
+	GLuint texture_id = (GLuint)texture_handle;
+	glBindTexture(GL_TEXTURE_2D, texture_id);
+	glTexSubImage2D(GL_TEXTURE_2D, 0, source_position.x, source_position.y, source_dimensions.x, source_dimensions.y, GL_RGBA, GL_UNSIGNED_BYTE, source);
+	return true;
+}
+
 // Called by Rocket when a loaded texture is no longer required.		
 void ShellRenderInterfaceOpenGL::ReleaseTexture(Rocket::Core::TextureHandle texture_handle)
 {

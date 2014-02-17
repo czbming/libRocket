@@ -62,6 +62,13 @@ bool Texture::Load(const String& source, const String& source_path)
 	return resource != NULL;
 }
 
+// Attempts to update the texture.
+void Texture::Update()
+{
+	if (resource)
+		this->resource->Update();
+}
+
 // Returns the texture's source name. This is usually the name of the file the texture was loaded from.
 String Texture::GetSource() const
 {

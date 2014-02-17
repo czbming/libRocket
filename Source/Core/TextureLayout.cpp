@@ -27,37 +27,42 @@
 
 #include "precompiled.h"
 #include "TextureLayout.h"
-#include <algorithm>
 #include "TextureLayoutRectangle.h"
 #include "TextureLayoutTexture.h"
 
 namespace Rocket {
 namespace Core {
 
-struct RectangleSort
+TextureLayout::TextureLayout() : max_rectangle_dimension(0, 0)
 {
-	bool operator()(const TextureLayoutRectangle& lhs, const TextureLayoutRectangle& rhs) const
-	{
-		return lhs.GetDimensions().y > rhs.GetDimensions().y;
-	}
-};
-
-TextureLayout::TextureLayout()
-{
+	has_generated = false;
 }
 
 TextureLayout::~TextureLayout()
 {
+	for (RectangleList::iterator i = rectangles.begin(); i != rectangles.end(); ++i)
+		delete *i;
+
+	while(!unplaced_rectangles.empty())
+	{
+		delete unplaced_rectangles.front();
+		unplaced_rectangles.pop();
+	}
+
+	for (TextureList::iterator i = textures.begin(); i != textures.end(); ++i)
+		delete *i;
 }
 
 // Adds a rectangle to the list of rectangles to be laid out.
 void TextureLayout::AddRectangle(int id, const Vector2i& dimensions)
 {
-	rectangles.push_back(TextureLayoutRectangle(id, dimensions));
+	unplaced_rectangles.push(new TextureLayoutRectangle(id, dimensions));
+	max_rectangle_dimension.x = Math::Max(max_rectangle_dimension.x, dimensions.x);
+	max_rectangle_dimension.y = Math::Max(max_rectangle_dimension.y, dimensions.y);
 }
 
 // Returns one of the layout's rectangles.
-TextureLayoutRectangle& TextureLayout::GetRectangle(int index)
+TextureLayoutRectangle* TextureLayout::GetRectangle(int index)
 {
 	ROCKET_ASSERT(index >= 0);
 	ROCKET_ASSERT(index < GetNumRectangles());
@@ -72,7 +77,7 @@ int TextureLayout::GetNumRectangles() const
 }
 
 // Returns one of the layout's textures.
-TextureLayoutTexture& TextureLayout::GetTexture(int index)
+TextureLayoutTexture* TextureLayout::GetTexture(int index)
 {
 	ROCKET_ASSERT(index >= 0);
 	ROCKET_ASSERT(index < GetNumTextures());
@@ -89,19 +94,35 @@ int TextureLayout::GetNumTextures() const
 // Attempts to generate an efficient texture layout for the rectangles.
 bool TextureLayout::GenerateLayout(int max_texture_dimensions)
 {
-	// Sort the rectangles by height.
-	std::sort(rectangles.begin(), rectangles.end(), RectangleSort());
-
-	int num_placed_rectangles = 0;
-	while (num_placed_rectangles != GetNumRectangles())
+	if (has_generated)
 	{
-		TextureLayoutTexture texture;
-		int texture_size = texture.Generate(*this, max_texture_dimensions);
-		if (texture_size == 0)
-			return false;
+		while (!unplaced_rectangles.empty())
+		{
+			if (textures.back()->IsFull())
+			{
+				TextureLayoutTexture* texture = new TextureLayoutTexture();
+				textures.push_back(texture);
+				texture->Generate(*this, max_texture_dimensions >> 1);	// Half-dimension
+			}
+			else
+				textures.back()->Generate(*this, max_texture_dimensions);
+		}
+	}
+	else
+	{
+		// Initial generation
+		while (!unplaced_rectangles.empty())
+		{
+			TextureLayoutTexture* texture = new TextureLayoutTexture();
+			if (texture->Generate(*this, max_texture_dimensions) == 0)
+			{
+				delete texture;
+				return false;
+			}
 
-		textures.push_back(texture);
-		num_placed_rectangles += texture_size;
+			textures.push_back(texture);
+		}
+		has_generated = true;
 	}
 
 	return true;

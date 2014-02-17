@@ -49,19 +49,21 @@ public:
 
 	/// Attempts to position unplaced rectangles from the layout into this row.
 	/// @param[in] layout The layout to position rectangles from.
-	/// @param[in] width The maximum width of this row.
+	/// @param[in] max_width The maximum width of this row.
 	/// @param[in] y The y-coordinate of this row.
 	/// @return The number of placed rectangles.
-	int Generate(TextureLayout& layout, int width, int y);
+	int Generate(TextureLayout& layout, int max_width, int y);
 
 	/// Assigns allocated texture data to all rectangles in this row.
 	/// @param[in] texture_data The pointer to the beginning of the texture's data.
 	/// @param[in] stride The stride of the texture's surface, in bytes;
 	void Allocate(byte* texture_data, int stride);
 
+	/// Returns the width of all placed rectangles.
+	inline int GetPlacedWidth() const;
 	/// Returns the height of the row.
 	/// @return The row's height.
-	int GetHeight() const;
+	inline int GetHeight() const;
 
 	/// Resets the placed status for all of the rectangles within this row.
 	void Unplace();
@@ -69,9 +71,22 @@ public:
 private:
 	typedef std::vector< TextureLayoutRectangle* > RectangleList;
 
+	int placed_width;
 	int height;
 	RectangleList rectangles;
 };
+
+// Returns the width of all placed rectangles.
+inline int TextureLayoutRow::GetPlacedWidth() const
+{
+	return placed_width;
+}
+
+// Returns the height of the row.
+inline int TextureLayoutRow::GetHeight() const
+{
+	return height;
+}
 
 }
 }

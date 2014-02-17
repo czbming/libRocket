@@ -30,6 +30,7 @@
 
 #include "TextureLayoutRectangle.h"
 #include "TextureLayoutTexture.h"
+#include <queue>
 
 namespace Rocket {
 namespace Core {
@@ -56,7 +57,7 @@ public:
 	/// Returns one of the layout's rectangles.
 	/// @param[in] index The index of the desired rectangle.
 	/// @return The desired rectangle.
-	TextureLayoutRectangle& GetRectangle(int index);
+	TextureLayoutRectangle* GetRectangle(int index);
 	/// Returns the number of rectangles in the layout.
 	/// @return The layout's rectangle count.
 	int GetNumRectangles() const;
@@ -64,7 +65,7 @@ public:
 	/// Returns one of the layout's textures.
 	/// @param[in] index The index of the desired texture.
 	/// @return The desired texture.
-	TextureLayoutTexture& GetTexture(int index);
+	TextureLayoutTexture* GetTexture(int index);
 	/// Returns the number of textures in the layout.
 	/// @return The layout's texture count.
 	int GetNumTextures() const;
@@ -75,11 +76,19 @@ public:
 	bool GenerateLayout(int max_texture_dimensions);
 
 private:
-	typedef std::vector< TextureLayoutRectangle > RectangleList;
-	typedef std::vector< TextureLayoutTexture > TextureList;
+	typedef std::vector< TextureLayoutRectangle* > RectangleList;
+	typedef std::queue< TextureLayoutRectangle* > RectangleQueue;
+	typedef std::vector< TextureLayoutTexture* > TextureList;
 
 	TextureList textures;
 	RectangleList rectangles;
+	RectangleQueue unplaced_rectangles;
+
+	Vector2i max_rectangle_dimension;
+	bool has_generated;
+
+	friend class TextureLayoutTexture;
+	friend class TextureLayoutRow;
 };
 
 }

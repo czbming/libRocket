@@ -34,6 +34,7 @@ namespace Core {
 
 TextureLayoutRow::TextureLayoutRow()
 {
+	placed_width = 1;
 	height = 0;
 }
 
@@ -44,43 +45,32 @@ TextureLayoutRow::~TextureLayoutRow()
 // Attempts to position unplaced rectangles from the layout into this row.
 int TextureLayoutRow::Generate(TextureLayout& layout, int max_width, int y)
 {
-	int width = 1;
-	int first_unplaced_index = 0;
 	int placed_rectangles = 0;
 
-	while (width < max_width)
+	while(!layout.unplaced_rectangles.empty())
 	{
-		// Find the first unplaced rectangle we can fit.
-		int index;
-		for (index = first_unplaced_index; index < layout.GetNumRectangles(); ++index)
-		{
-			TextureLayoutRectangle& rectangle = layout.GetRectangle(index);
-			if (!rectangle.IsPlaced())
-			{
-				if (width + rectangle.GetDimensions().x + 1 <= max_width)
-					break;
-			}
-		}
-
-		if (index == layout.GetNumRectangles())
-			return placed_rectangles;
-
-		TextureLayoutRectangle& rectangle = layout.GetRectangle(index);
+		TextureLayoutRectangle* rectangle = layout.unplaced_rectangles.front();
+		if (placed_width + rectangle->GetDimensions().x + 1 > max_width)
+			break;
 
 		// Increment the row height if necessary.
-		height = Math::Max(height, rectangle.GetDimensions().y);
+		height = Math::Max(height, rectangle->GetDimensions().y);
 
 		// Add this glyph onto our list and mark it as placed.
-		rectangles.push_back(&rectangle);
-		rectangle.Place(layout.GetNumTextures(), Vector2i(width, y));
+		rectangles.push_back(rectangle);
+		if (layout.has_generated)
+			rectangle->Place(layout.GetNumTextures()-1, Vector2i(placed_width, y));
+		else
+			rectangle->Place(layout.GetNumTextures(), Vector2i(placed_width, y));
 		++placed_rectangles;
 
 		// Increment our width. An extra pixel is added on so the rectangles aren't pushed up
 		// against each other. This will avoid filtering artifacts.
-		if (rectangle.GetDimensions().x > 0)
-			width += rectangle.GetDimensions().x + 1;
+		if (rectangle->GetDimensions().x > 0)
+			placed_width += rectangle->GetDimensions().x + 1;
 
-		first_unplaced_index = index + 1;
+		layout.rectangles.push_back(rectangle);
+		layout.unplaced_rectangles.pop();
 	}
 
 	return placed_rectangles;
@@ -89,20 +79,16 @@ int TextureLayoutRow::Generate(TextureLayout& layout, int max_width, int y)
 // Assigns allocated texture data to all rectangles in this row.
 void TextureLayoutRow::Allocate(byte* texture_data, int stride)
 {
-	for (size_t i = 0; i < rectangles.size(); ++i)
+	size_t rectangle_count = rectangles.size();
+	for (size_t i = 0; i < rectangle_count; ++i)
 		rectangles[i]->Allocate(texture_data, stride);
-}
-
-// Returns the height of the row.
-int TextureLayoutRow::GetHeight() const
-{
-	return height;
 }
 
 // Resets the placed status for all of the rectangles within this row.
 void TextureLayoutRow::Unplace()
 {
-	for (size_t i = 0; i < rectangles.size(); ++i)
+	size_t rectangle_count = rectangles.size();
+	for (size_t i = 0; i < rectangle_count; ++i)
 		rectangles[i]->Unplace();
 }
 

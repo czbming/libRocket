@@ -94,11 +94,9 @@ public:
 	/// @return The index to use when generating geometry using this configuration.
 	int GenerateLayerConfiguration(FontEffectMap& font_effects);
 	/// Generates the texture data for a layer (for the texture database).
-	/// @param[out] texture_data The pointer to be set to the generated texture data.
-	/// @param[out] texture_dimensions The dimensions of the texture.
 	/// @param[in] layer_id The id of the layer to request the texture data from.
 	/// @param[in] texture_id The index of the texture within the layer to generate.
-	bool GenerateLayerTexture(const byte*& texture_data, Vector2i& texture_dimensions, FontEffect* layer_id, int texture_id);
+	bool GenerateLayerTexture(FontEffect* layer_id, int texture_id);
 
 	/// Generates the geometry required to render a single line of text.
 	/// @param[out] geometry An array of geometries to generate the geometry into.
@@ -106,7 +104,7 @@ public:
 	/// @param[in] position The position of the baseline of the first character to render.
 	/// @param[in] colour The colour to render the text.
 	/// @return The width, in pixels, of the string geometry.
-	int GenerateString(GeometryList& geometry, const WString& string, const Vector2f& position, const Colourb& colour, int layer_configuration = 0) const;
+	int GenerateString(GeometryList& geometry, const WString& string, const Vector2f& position, const Colourb& colour, int layer_configuration = 0);
 	/// Generates the geometry required to render a line above, below or through a line of text.
 	/// @param[out] geometry The geometry to append the newly created geometry into.
 	/// @param[in] position The position of the baseline of the lined text.
@@ -127,22 +125,19 @@ protected:
 	virtual void OnReferenceDeactivate();
 
 private:
-	void GenerateMetrics(FT_Face ft_face);
+	void GenerateMetrics(void);
 
-	void BuildGlyphMap(FT_Face ft_face, const UnicodeRange& unicode_range);
+	bool BuildGlyph(word character_code);
 	void BuildGlyph(FontGlyph& glyph, FT_GlyphSlot ft_glyph);
 
-	void BuildKerning(FT_Face ft_face);
 	int GetKerning(word lhs, word rhs) const;
 
 	// Generates (or shares) a layer derived from a font effect.
 	FontFaceLayer* GenerateLayer(FontEffect* font_effect);
 
-	typedef std::vector< int > GlyphKerningList;
-	typedef std::vector< GlyphKerningList > FontKerningList;
+	FT_Face ft_face;
 
 	FontGlyphList glyphs;
-	FontKerningList kerning;
 
 	typedef std::map< const FontEffect*, FontFaceLayer* > FontLayerMap;
 	typedef std::map< String, FontFaceLayer* > FontLayerCache;

@@ -82,6 +82,116 @@ public:
 	/// @return True if the conversion went successfully, false if not.
 	static bool UCS2toUTF8(const word* input, size_t input_size, String& output);
 
+	/// Checks if a given value is a CJK character. This corresponds to Unicode 6.0.
+	template < typename CharacterType >
+	static bool IsCJKCharacter(CharacterType x)
+	{
+		if (x >= 0x2E80 && x <= 0x2FA1F)
+		{
+			// CJK Unified Ideographs
+			if (x >= 0x4E00 && x <= 0x9FFF)
+				return true;
+			// CJK Symbols and Punctuation
+			if (x >= 0x3000 && x <= 0x303F)
+				return true;
+			// CJK Unified Ideographs Extension A
+			if (x >= 0x3400 && x <= 0x4DBF)
+				return true;
+			// CJK Compatibility Ideographs.
+			if (x >= 0xF900 && x <= 0xFAFF)
+				return true;
+			// Halfwidth and Fullwidth Forms
+			if (x >= 0xFF00 && x <= 0xFFEF)
+				return true;
+
+			// Hiragana
+			if (x >= 0x3040 && x <= 0x309F)
+				return true;
+			// Katakana
+			if (x >= 0x30A0 && x <= 0x30FF)
+				return true;
+			// Bopomofo
+			if (x >= 0x3100 && x <= 0x312F)
+				return true;
+			// Hangul Compatibility Jamo
+			if (x >= 0x3130 && x <= 0x318F)
+				return true;
+
+			// CJK Radicals Supplement
+			if (x >= 0x2E80 && x <= 0x2EFF)
+				return true;
+			// Kangxi Radicals
+			if (x >= 0x2F00 && x <= 0x2FDF)
+				return true;
+			// Ideographic Description Characters
+			if (x >= 0x2FF0 && x <= 0x2FFF)
+				return true;
+			// CJK Strokes.
+			if (x >= 0x31C0 && x <= 0x31EF)
+				return true;
+
+			// Kanbun
+			if (x >= 0x3190 && x <= 0x319F)
+				return true;
+			// Bopomofo Extended
+			if (x >= 0x31A0 && x <= 0x31BF)
+				return true;
+			// Katakana Phonetic Extensions
+			if (x >= 0x31F0 && x <= 0x31FF)
+				return true;
+			// Enclosed CJK Letters and Months
+			if (x >= 0x3200 && x <= 0x32FF)
+				return true;
+			// Enclosed CJK Letters and Months
+			if (x >= 0x3300 && x <= 0x33FF)
+				return true;
+
+			// Hangul Jamo Extended-A
+			if (x >= 0xA960 && x <= 0xA97F)
+				return true;
+			// Hangul Syllables
+			if (x >= 0xAC00 && x <= 0xD7AF)
+				return true;
+			// Hangul Jamo Extended-B
+			if (x >= 0xD7B0 && x <= 0xD7FF)
+				return true;
+			// Kana Supplement
+			if (x >= 0x1B000 && x <= 0x1B0FF)
+				return true;
+
+			// CJK Unified Ideographs Extension B
+			if (x >= 0x20000 && x <= 0x2A6DF)
+				return true;
+			// CJK Unified Ideographs Extension C
+			if (x >= 0x2A700 && x <= 0x2B73F)
+				return true;
+			// CJK Unified Ideographs Extension D
+			if (x >= 0x2B740 && x <= 0x2B81F)
+				return true;
+			// CJK Compatibility Ideographs Supplement
+			if (x >= 0x2F800 && x <= 0x2FA1F)
+				return true;
+
+			// Yijing Hexagram Symbols
+			if (x >= 0x4DC0 && x <= 0x4DFF)
+				return true;
+			// Vertical forms
+			if (x >= 0xFE10 && x <= 0xFE1F)
+				return true;
+			// CJK Compatibility Forms
+			if (x >= 0xFE30 && x <= 0xFE4F)
+				return true;
+			// Tai Xuan Hing Symbols
+			if (x >= 0x1D300 && x <= 0x1D35F)
+				return true;
+			// Enclosed Ideographic Supplement 
+			if (x >= 0x1F200 && x <= 0x1F2FF)
+				return true;
+		}
+
+		return false;
+	}
+
 	/// Checks if a given value is a whitespace character.
 	/// @param[in] x The character to evaluate.
 	/// @return True if the character is whitespace, false otherwise.

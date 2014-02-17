@@ -429,6 +429,16 @@ static bool BuildToken(WString& token, const word*& token_begin, const word* str
 {
 	ROCKET_ASSERT(token_begin != string_end);
 
+	bool cjk_character = StringUtilities::IsCJKCharacter(*token_begin);
+	// Full-width latin characters in CJK.
+	bool fullwidth_latin_character = (*token_begin >= 0xFF01 && *token_begin <= 0xFF5E);
+	if (cjk_character && !fullwidth_latin_character)
+	{
+		token += *token_begin;
+		++token_begin;
+		return false;
+	}
+
 	// Check what the first character of the token is; all we need to know is if it is white-space or not.
 	bool parsing_white_space = StringUtilities::IsWhitespace(*token_begin);
 
@@ -541,17 +551,26 @@ static bool BuildToken(WString& token, const word*& token_begin, const word* str
 			{
 				if (character >= 'a' && character <= 'z')
 					character += (Rocket::Core::word)('A' - 'a');
+				else if (fullwidth_latin_character && character >= 0xFF41 && character <= 0xFF5A)
+					character += (Rocket::Core::word)(0xFF21 - 0xFF41);
 			}
 			else if (text_transformation == TEXT_TRANSFORM_LOWERCASE)
 			{
 				if (character >= 'A' && character <= 'Z')
 					character -= (Rocket::Core::word)('A' - 'a');
+				else if (fullwidth_latin_character && character >= 0xFF21 && character <= 0xFF3A)
+					character -= (Rocket::Core::word)(0xFF21 - 0xFF41);
 			}
 
 			token += character;
 		}
 
 		++token_begin;
+
+		cjk_character = StringUtilities::IsCJKCharacter(*token_begin);
+		fullwidth_latin_character = (*token_begin >= 0xFF01 && *token_begin <= 0xFF5E);
+		if (cjk_character && !fullwidth_latin_character)
+			return false;
 	}
 
 	return false;
