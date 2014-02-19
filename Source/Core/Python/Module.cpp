@@ -60,7 +60,7 @@ BOOST_PYTHON_MODULE(_rocketcore)
 
 	InitialisePythonKeyMap();
 
-	bool (*LoadFontFace)(const Rocket::Core::String&) = &FontDatabase::LoadFontFace;
+	bool (*LoadFontFace)(const Rocket::Core::String&, int) = &FontDatabase::LoadFontFace;
 
 	python::def("CreateContext", &CreateContext);
 	python::def("LoadFontFace", LoadFontFace);
