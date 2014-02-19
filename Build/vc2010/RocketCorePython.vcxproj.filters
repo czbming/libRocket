@@ -1,0 +1,159 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Context">
+      <UniqueIdentifier>{4e425ed5-da92-44ee-ad83-47d302eb01d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Elements">
+      <UniqueIdentifier>{a700150f-dd0c-409e-b7f9-32dc7f8b5e93}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Events">
+      <UniqueIdentifier>{09313e90-0109-4afc-aba6-c2ccc1b4267c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Precompiled Header">
+      <UniqueIdentifier>{2a31ff12-8fca-4251-9cfd-f42c825becb4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Core">
+      <UniqueIdentifier>{d6c9d164-e335-49bf-bfce-584e0aa6b374}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\Core\Python\ContextDocumentProxy.cpp">
+      <Filter>Context</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\ContextInstancer.cpp">
+      <Filter>Context</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\ContextInterface.cpp">
+      <Filter>Context</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\ContextProxy.cpp">
+      <Filter>Context</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\Converters.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\Module.cpp" />
+    <ClCompile Include="..\..\Source\Core\Python\Interfaces.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\Utilities.cpp">
+      <Filter>Core</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\ElementAttributeProxy.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\ElementChildrenProxy.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\ElementDocumentWrapper.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\ElementInterface.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\ElementStyleProxy.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\EventInstancer.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\EventInterface.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\EventListener.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\EventListenerInstancer.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\EventWrapper.cpp">
+      <Filter>Events</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Core\Python\precompiled.cpp">
+      <Filter>Precompiled Header</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\Core\Python\ContextProxy.h">
+      <Filter>Context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\ContextDocumentProxy.h">
+      <Filter>Context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\ContextInstancer.h">
+      <Filter>Context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\ContextInterface.h">
+      <Filter>Context</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\Converters.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\Module.h" />
+    <ClInclude Include="..\..\Include\Rocket\Core\Python\Header.h" />
+    <ClInclude Include="..\..\Include\Rocket\Core\Python\ConverterScriptObject.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Rocket\Core\Python\NameIndexInterface.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Rocket\Core\Python\PickleTypeConverter.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Rocket\Core\Python\Python.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Rocket\Core\Python\Utilities.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Rocket\Core\Python\VectorInterface.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Rocket\Core\Python\Wrapper.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Rocket\Core\Python\WrapperIter.h">
+      <Filter>Core</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\ElementAttributeProxy.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\ElementChildrenProxy.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\ElementDocumentWrapper.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Rocket\Core\Python\ElementInstancer.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\ElementInterface.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\ElementStyleProxy.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Rocket\Core\Python\ElementWrapper.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\EventWrapper.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\EventInstancer.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\EventInterface.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\EventListener.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\EventListenerInstancer.h">
+      <Filter>Events</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Core\Python\precompiled.h">
+      <Filter>Precompiled Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

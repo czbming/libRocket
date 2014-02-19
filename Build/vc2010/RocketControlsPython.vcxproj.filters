@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Elements">
+      <UniqueIdentifier>{35f50ff3-835c-4821-a7da-8b738da1c894}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Precompiled Header">
+      <UniqueIdentifier>{ef9b7d7f-dcef-4a0c-970c-6dabaf16ba0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="DataSource">
+      <UniqueIdentifier>{6b13dd0b-ae29-4170-9b4e-b0e5acce51a5}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\Controls\Python\Module.cpp" />
+    <ClCompile Include="..\..\Source\Controls\Python\DataSourceWrapper.cpp">
+      <Filter>DataSource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Python\DataFormatterWrapper.cpp">
+      <Filter>DataSource</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Python\precompiled.cpp">
+      <Filter>Precompiled Header</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Python\DataGridRowProxy.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Python\ElementInterface.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Python\SelectOptionProxy.cpp">
+      <Filter>Elements</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\Controls\Python\Module.h" />
+    <ClInclude Include="..\..\Source\Controls\Python\DataSourceWrapper.h">
+      <Filter>DataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Python\DataFormatterWrapper.h">
+      <Filter>DataSource</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Python\precompiled.h">
+      <Filter>Precompiled Header</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Python\DataGridRowProxy.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Python\ElementInterface.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Python\SelectOptionProxy.h">
+      <Filter>Elements</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
