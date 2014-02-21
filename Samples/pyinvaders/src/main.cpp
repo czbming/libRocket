@@ -81,6 +81,7 @@ int main(int, char**)
 	// Rocket initialisation.
 	ShellRenderInterfaceOpenGL opengl_renderer;
 	Rocket::Core::SetRenderInterface(&opengl_renderer);
+	opengl_renderer.SetViewport(1024, 768);
 
 	ShellSystemInterface system_interface;
 	Rocket::Core::SetSystemInterface(&system_interface);
