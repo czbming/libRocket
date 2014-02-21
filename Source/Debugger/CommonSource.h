@@ -40,6 +40,7 @@ static const char* common_rcss =
 "}\n"
 "em\n"
 "{\n"
+"	font-family: Lacuna Italic;\n"
 "	font-style: italic;\n"
 "}\n"
 "h1\n"
