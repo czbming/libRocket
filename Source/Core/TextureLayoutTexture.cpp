@@ -183,6 +183,7 @@ int TextureLayoutTexture::Generate(TextureLayout& layout, int maximum_dimensions
 
 		rows.clear();
 		num_placed_rectangles = 0;
+		prior_placed_height = placed_height = 1;
 	}
 }
 
