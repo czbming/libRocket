@@ -113,7 +113,7 @@ OSStatus InputMacOSX::EventHandler(EventHandlerCallRef next_handler, EventRef ev
 			switch (GetEventKind(event))
 			{
 				case kEventRawKeyDown:
-                case kEventRawKeyRepeat:
+				case kEventRawKeyRepeat:
 				{
 					UInt32 key_code;
 					if (GetEventParameter(event, kEventParamKeyCode, typeUInt32, NULL, sizeof(UInt32), NULL, &key_code) == noErr)
@@ -157,39 +157,39 @@ OSStatus InputMacOSX::EventHandler(EventHandlerCallRef next_handler, EventRef ev
 
 		case kEventClassTextInput:
 		{
-            switch (GetEventKind(event))
+			switch (GetEventKind(event))
 			{
 				case kEventTextInputUnicodeForKeyEvent:
 				{
-                    ByteCount data_size;
-                    if (GetEventParameter(event, kEventParamTextInputSendText, typeUnicodeText, NULL, 0, &data_size, NULL) == noErr)
-                    {
-                        int num = data_size / sizeof(UniChar);
-                        UniChar* buf = new UniChar[num];
-                        GetEventParameter(event, kEventParamTextInputSendText, typeUnicodeText, NULL, data_size, NULL, buf);
+					ByteCount data_size;
+					if (GetEventParameter(event, kEventParamTextInputSendText, typeUnicodeText, NULL, 0, &data_size, NULL) == noErr)
+					{
+						int num = data_size / sizeof(UniChar);
+						UniChar* buf = new UniChar[num];
+						GetEventParameter(event, kEventParamTextInputSendText, typeUnicodeText, NULL, data_size, NULL, buf);
 
-                        EventRef raw_event;
-                        UInt32 key_code;
-                        GetEventParameter(event, kEventParamTextInputSendKeyboardEvent, typeEventRef, NULL, sizeof(EventRef), NULL, &raw_event);
-                        GetEventParameter(raw_event, kEventParamKeyCode, typeUInt32, NULL, sizeof(UInt32), NULL, &key_code);
-                        
-                        Rocket::Core::Input::KeyIdentifier key_identifier = key_identifier_map[key_code & 0xFF];
+						EventRef raw_event;
+						UInt32 key_code;
+						GetEventParameter(event, kEventParamTextInputSendKeyboardEvent, typeEventRef, NULL, sizeof(EventRef), NULL, &raw_event);
+						GetEventParameter(raw_event, kEventParamKeyCode, typeUInt32, NULL, sizeof(UInt32), NULL, &key_code);
+
+						Rocket::Core::Input::KeyIdentifier key_identifier = key_identifier_map[key_code & 0xFF];
 						int key_modifier_state = GetKeyModifierState(raw_event);
-                        Rocket::Core::word character = GetCharacterCode(key_identifier, key_modifier_state);
-                        if (key_identifier == Rocket::Core::Input::KI_UNKNOWN || character > 0)
-                            context->ProcessTextInput(Rocket::Core::WString(buf, buf + num));
-                        
-                        if (buf)
-                            delete []buf;
-                    }
+						Rocket::Core::word character = GetCharacterCode(key_identifier, key_modifier_state);
+						if (key_identifier == Rocket::Core::Input::KI_UNKNOWN || character > 0)
+							context->ProcessTextInput(Rocket::Core::WString(buf, buf + num));
+
+						if (buf)
+							delete []buf;
+					}
 				}
-                break;
-                    
+				break;
+
 				default:
 					break;
 			}
 		}
-        break;
+		break;
             
 		default:
 			break;

@@ -1,0 +1,25 @@
+﻿<rml>
+    <head>
+        <title>Chat Box</title>
+        <link type="text/rcss" href="../../../assets/rkt.rcss"/>
+        <link type="text/rcss" href="../../../assets/invader.rcss"/>
+        <link type="text/rcss" href="chat_box.rcss"/>
+        <style>
+            body
+            {
+                font-family: Microsoft JhengHei;
+                font-charset: U+0020-007E,U+FF00-FFEF;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="display">
+            <p>雖然小頑皮很喜歡問東問西，可是他還沒想通為什麼這玩意會叫牙刷，而不是牙齒刷。</p>
+        </div>
+        <form id="input">
+            <input type="submit" value="switch language">繁</input>
+            <input type="text"/>
+            <input type="submit" value="send text">發送</input>
+        </form>
+    </body>
+</rml>

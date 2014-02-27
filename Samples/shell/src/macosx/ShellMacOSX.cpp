@@ -36,7 +36,7 @@
 
 static const EventTypeSpec INPUT_EVENTS[] = {
 	{ kEventClassKeyboard, kEventRawKeyDown },
-    { kEventClassKeyboard, kEventRawKeyRepeat },
+	{ kEventClassKeyboard, kEventRawKeyRepeat },
 	{ kEventClassKeyboard, kEventRawKeyUp },
 	{ kEventClassKeyboard, kEventRawKeyModifiersChanged },
 

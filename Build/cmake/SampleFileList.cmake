@@ -33,7 +33,16 @@ set(loaddocument_HDR_FILES
 )
 
 set(loaddocument_SRC_FILES
-    ${PROJECT_SOURCE_DIR}/Samples/basic/loaddocument/src/main.cpp
+    ${PROJECT_SOURCE_DIR}/Samples/basic/dynamicfont/src/main.cpp
+)
+
+set(dynamicfont_HDR_FILES
+    ${PROJECT_SOURCE_DIR}/Samples/basic/dynamicfont/src/ChatBox.h
+)
+
+set(dynamicfont_SRC_FILES
+    ${PROJECT_SOURCE_DIR}/Samples/basic/dynamicfont/src/main.cpp
+    ${PROJECT_SOURCE_DIR}/Samples/basic/dynamicfont/src/ChatBox.cpp
 )
 
 set(ogre3d_HDR_FILES
