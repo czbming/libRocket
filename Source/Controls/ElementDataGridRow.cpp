@@ -425,7 +425,7 @@ void ElementDataGridRow::RemoveChildren(int first_row_removed, int num_rows_remo
 	}
 
 	children.erase(children.begin() + first_row_removed, children.begin() + (first_row_removed + num_rows_removed));
-    for (int i = first_row_removed; i < (int) children.size(); i++)
+	for (int i = first_row_removed; i < (int) children.size(); i++)
 	{
 		children[i]->SetChildIndex(i);
 		children[i]->DirtyTableRelativeIndex();

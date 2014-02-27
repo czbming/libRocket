@@ -62,7 +62,7 @@ class RocketApplication : public ExampleApplication, public Ogre::RenderQueueLis
 		/// Called from Ogre before a queue group is rendered.
 		virtual void renderQueueStarted(uint8 queueGroupId, const Ogre::String& invocation, bool& skipThisInvocation);
 		/// Called from Ogre after a queue group is rendered.
-        virtual void renderQueueEnded(uint8 queueGroupId, const Ogre::String& invocation, bool& repeatThisInvocation);
+		virtual void renderQueueEnded(uint8 queueGroupId, const Ogre::String& invocation, bool& repeatThisInvocation);
 
 	private:
 		// Configures Ogre's rendering system for rendering Rocket.

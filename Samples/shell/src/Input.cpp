@@ -34,8 +34,8 @@
 
 char ascii_map[4][51] =
 {
-    // shift off and capslock off
-    {
+	// shift off and capslock off
+	{
 		0,
 		' ',
 		'0',
@@ -90,7 +90,7 @@ char ascii_map[4][51] =
 	},
 
 	// shift on and capslock off
-    {
+	{
 		0,
 		' ',
 		')',
@@ -145,7 +145,7 @@ char ascii_map[4][51] =
 	},
 
 	// shift on and capslock on
-    {
+	{
 		0,
 		' ',
 		')',
@@ -200,7 +200,7 @@ char ascii_map[4][51] =
 	},
 
 	// shift off and capslock on
-    {
+	{
 		0,
 		' ',
 		'1',
@@ -252,7 +252,7 @@ char ascii_map[4][51] =
 		'\'',
 		0,
 		0
-	}      
+	}
 };
 
 char keypad_map[2][18] = 

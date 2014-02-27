@@ -272,7 +272,7 @@ void WidgetTextInput::ProcessEvent(Core::Event& event)
 		Core::Input::KeyIdentifier key_identifier = (Core::Input::KeyIdentifier) event.GetParameter< int >("key_identifier", 0);
 		bool numlock = event.GetParameter< int >("num_lock_key", 0) > 0;
 		bool shift = event.GetParameter< int >("shift_key", 0) > 0;
-        bool ctrl = event.GetParameter< int >("ctrl_key", 0) > 0;
+		bool ctrl = event.GetParameter< int >("ctrl_key", 0) > 0;
 
 		switch (key_identifier)
 		{
@@ -328,35 +328,35 @@ void WidgetTextInput::ProcessEvent(Core::Event& event)
 
 			case Core::Input::KI_C:
 			{
-                if (ctrl)
-                    CopySelection();
+				if (ctrl)
+					CopySelection();
 			}
 			break;
 
 			case Core::Input::KI_X:
 			{
-                if (ctrl)
-                {
-                    CopySelection();
-                    DeleteSelection();
-                }
+				if (ctrl)
+				{
+					CopySelection();
+					DeleteSelection();
+				}
 			}
 			break;
 
 			case Core::Input::KI_V:
 			{
-                if (ctrl)
-                {
-    				const Core::WString clipboard_content = Clipboard::Get();
-    				for (size_t i = 0; i < clipboard_content.Length(); ++i)
-    				{
-    					if (max_length > 0 &&
-    						(int) Core::WString(GetElement()->GetAttribute< Rocket::Core::String >("value", "")).Length() < max_length)
-    						break;
+				if (ctrl)
+				{
+					const Core::WString clipboard_content = Clipboard::Get();
+					for (size_t i = 0; i < clipboard_content.Length(); ++i)
+					{
+						if (max_length > 0 &&
+							(int) Core::WString(GetElement()->GetAttribute< Rocket::Core::String >("value", "")).Length() < max_length)
+							break;
 
-    					AddCharacter(clipboard_content[i]);
-    				}
-                }
+						AddCharacter(clipboard_content[i]);
+					}
+				}
 			}
 			break;
 
@@ -388,20 +388,20 @@ void WidgetTextInput::ProcessEvent(Core::Event& event)
 		event.StopPropagation();
 	}
 	else if (event == "focus" &&
-			 event.GetTargetElement() == parent)
+			event.GetTargetElement() == parent)
 	{
 		UpdateSelection(false);
 		ShowCursor(true, false);
 	}
 	else if (event == "blur" &&
-		     event.GetTargetElement() == parent)
+			event.GetTargetElement() == parent)
 	{
 		ClearSelection();
 		ShowCursor(false, false);
 	}	
 	else if ((event == "mousedown" ||
-			  event == "drag") &&
-			 event.GetTargetElement() == parent)
+			event == "drag") &&
+			event.GetTargetElement() == parent)
 	{
 		Rocket::Core::Vector2f mouse_position = Rocket::Core::Vector2f((float) event.GetParameter< int >("mouse_x", 0),
 																 (float) event.GetParameter< int >("mouse_y", 0));

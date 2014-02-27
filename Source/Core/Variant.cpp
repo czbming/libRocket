@@ -53,7 +53,7 @@ void Variant::Clear()
 {
 	// Free any allocated types.
 	switch (type) 
-	{      
+	{
 		case STRING:
 		{
 			// Clean up the string.

@@ -165,7 +165,7 @@ ROCKETCORE_API int RealToInteger(float value)
 		cmp  ecx, 0;
 		je   loop2;
 		shr  eax, 1;
-		or   eax, 80000000h;        
+		or   eax, 80000000h;
 	loop1:
 		shr  eax, 1;			// shift (total bits - power bits);
 		sub  ecx, 1;

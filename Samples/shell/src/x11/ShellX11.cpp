@@ -157,7 +157,7 @@ bool Shell::OpenWindow(const char* name, bool attach_opengl)
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 
-    return true;
+	return true;
 }
 
 void Shell::CloseWindow()

@@ -294,11 +294,11 @@ void WidgetSlider::FormatElements(const Rocket::Core::Vector2f& containing_block
 
 	if (parent->IsDisabled())
 	{
-	    // Propagate disabled state to child elements
-	    bar->SetPseudoClass("disabled", true);
-	    track->SetPseudoClass("disabled", true);
-	    arrows[0]->SetPseudoClass("disabled", true);
-	    arrows[1]->SetPseudoClass("disabled", true);
+		// Propagate disabled state to child elements
+		bar->SetPseudoClass("disabled", true);
+		track->SetPseudoClass("disabled", true);
+		arrows[0]->SetPseudoClass("disabled", true);
+		arrows[1]->SetPseudoClass("disabled", true);
 	}
 }
 

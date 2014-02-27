@@ -63,14 +63,14 @@ FontFaceHandle::FontFaceHandle()
 FontFaceHandle::~FontFaceHandle()
 {
 	for (FontGlyphList::iterator i = glyphs.begin(); i != glyphs.end(); ++i)
-    {
+	{
 		FontGlyph* glyph = *i;
 		if (glyph)
 		{
 			delete[] glyph->bitmap_data;
 			delete glyph;
 		}
-    }
+	}
 
 	for (FontLayerMap::iterator i = layers.begin(); i != layers.end(); ++i)
 		delete i->second;
@@ -178,7 +178,7 @@ int FontFaceHandle::GetStringWidth(const WString& string, word prior_character) 
 		if (character_code >= glyph_count)
 			continue;
 		const FontGlyph* glyph = glyphs[character_code];
-        if (!glyph)
+		if (!glyph)
 			continue;
 
 		// Adjust the cursor for the kerning between this character and the previous one.

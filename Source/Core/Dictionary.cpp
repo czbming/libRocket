@@ -253,11 +253,11 @@ Dictionary::DictionaryEntry* Dictionary::Retrieve(const String& key, Hash hash) 
 	for (perturb = hash; ; perturb >>= PERTURB_SHIFT) {
 		i = (i << 2) + i + perturb + 1;
 		ep = &ep0[i & mask];
-		if (ep->key.Empty())    
+		if (ep->key.Empty())
 			return freeslot == NULL ? ep : freeslot;
 		/*if (ep->me_key == key
-		    || (ep->me_hash == hash
-		        && ep->me_key != dummy_key
+			|| (ep->me_hash == hash
+				&& ep->me_key != dummy_key
 				&& _PyString_Eq(ep->me_key, key)))*/
 		if (ep->key == key)
 			return ep;
@@ -316,8 +316,8 @@ bool Dictionary::Reserve(int minused)
 	
 	/* Find the smallest table size > minused. */
 	for (newsize = DICTIONARY_MINSIZE;
-	     newsize <= minused && newsize > 0;
-	     newsize <<= 1);
+		newsize <= minused && newsize > 0;
+		newsize <<= 1);
 	
 	ROCKET_ASSERT(newsize > 0);
 	

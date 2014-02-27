@@ -436,7 +436,7 @@ void StyleSheetNode::GetApplicableDescendants(std::vector< const StyleSheetNode*
 		break;
 
 		default:
-        break;
+		break;
 	}
 
 	if (properties.GetNumProperties() > 0 ||

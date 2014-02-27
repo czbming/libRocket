@@ -190,7 +190,7 @@ OSStatus InputMacOSX::EventHandler(EventHandlerCallRef next_handler, EventRef ev
 			}
 		}
 		break;
-            
+
 		default:
 			break;
 	}

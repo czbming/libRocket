@@ -61,7 +61,7 @@ int main(int ROCKET_UNUSED(argc), char** ROCKET_UNUSED(argv))
 	// Rocket initialisation.
 	ShellRenderInterfaceOpenGL opengl_renderer;
 	Rocket::Core::SetRenderInterface(&opengl_renderer);
-    opengl_renderer.SetViewport(1024,768);
+	opengl_renderer.SetViewport(1024, 768);
 
 
 	// Initialise our system interface to write the log messages to file.

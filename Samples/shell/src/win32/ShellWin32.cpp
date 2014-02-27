@@ -157,7 +157,7 @@ bool Shell::OpenWindow(const char* name, bool attach_opengl)
 			return false;
 	}
 
-    return true;
+	return true;
 }
 
 void Shell::CloseWindow()
