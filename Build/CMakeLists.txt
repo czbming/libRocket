@@ -205,7 +205,7 @@ endmacro()
 if(BUILD_SAMPLES)
     include(SampleFileList)
 
-    set(samples treeview customlog drag loaddocument)
+    set(samples treeview customlog drag loaddocument dynamicfont)
     set(tutorials template datagrid datagrid_tree tutorial_drag)
     
     set(sample_LIBRARIES
@@ -326,6 +326,9 @@ if(BUILD_SAMPLES)
     )
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/Samples/basic/drag/data
             DESTINATION ${SAMPLES_DIR}/basic/drag
+    )
+    install(DIRECTORY ${PROJECT_SOURCE_DIR}/Samples/basic/dynamicfont/data
+            DESTINATION ${SAMPLES_DIR}/basic/dynamicfont
     )
     install(DIRECTORY ${PROJECT_SOURCE_DIR}/Samples/invaders/data
             DESTINATION ${SAMPLES_DIR}/invaders
