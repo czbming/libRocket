@@ -1,0 +1,25 @@
+﻿<rml>
+    <head>
+        <title>Chat Box</title>
+        <link type="text/rcss" href="../../../assets/rkt.rcss" />
+        <link type="text/rcss" href="../../../assets/invader.rcss" />
+        <link type="text/rcss" href="chat_box.rcss" />
+        <style>
+            body
+            {
+                font-family: Delicious;
+                font-charset: U+0020-00FF;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="display">
+            <p>Ondanks zijn nieuwsgierige aard moet Swampy nog ontdekken waarom dit een tandenborstel heet.</p>
+        </div>
+        <form id="input" onsubmit="">
+            <input type="submit" value="switch language">NL</input>
+            <input type="text"/>
+            <input type="submit" value="send text">Sturen</input>
+        </form>
+    </body>
+</rml>

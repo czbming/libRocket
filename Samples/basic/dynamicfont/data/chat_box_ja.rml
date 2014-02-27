@@ -1,0 +1,25 @@
+﻿<rml>
+    <head>
+        <title>Chat Box</title>
+        <link type="text/rcss" href="../../../assets/rkt.rcss"/>
+        <link type="text/rcss" href="../../../assets/invader.rcss"/>
+        <link type="text/rcss" href="chat_box.rcss"/>
+        <style>
+            body
+            {
+                font-family: Meiryo UI;
+                font-charset: U+0020-007E,U+FF00-FFEF;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="display">
+            <p>スワンピーはなぜ歯ブラシは歯ブラシと呼ばれるのか不思議がっている。</p>
+        </div>
+        <form id="input">
+            <input type="submit" value="switch language">日</input>
+            <input type="text"/>
+            <input type="submit" value="send text">送信</input>
+        </form>
+    </body>
+</rml>

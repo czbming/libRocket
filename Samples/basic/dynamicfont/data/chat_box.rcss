@@ -1,0 +1,77 @@
+body
+{
+    width: 400px;
+    height: 300px;
+    margin: auto;
+    
+    font-weight: normal;
+    font-style: normal;
+    font-size: 15;
+    color: white;   
+    
+    outline-font-effect: outline;
+    outline-width: 1px;
+    outline-color: green;
+}
+
+scrollbarvertical
+{
+    margin-top: 0px;
+    margin-bottom: 0px;
+    margin-right: 0px;
+    width: 20px;
+}
+
+scrollbarvertical sliderbar
+{
+    margin-left: 3px;
+    width: 17px;
+    min-height: 46px;
+}
+
+scrollbarvertical sliderarrowdec,
+scrollbarvertical sliderarrowinc
+{
+    width: 20px;
+    height: 14px;
+}
+
+input.text
+{
+    vertical-align: middle;
+    height: 40px;
+    padding: 10px 10px 0px;
+    margin-left: 0px;
+    margin-top: -10px;
+
+    color: black;
+    font-size: 18;
+    outline-font-effect: none;
+}
+
+div#display
+{
+    overflow-y: scroll;
+    height: 260px;
+    background-color: #FFFFFF26;
+}
+form#input
+{
+    display: block;
+    white-space: nowrap;
+}
+form input.submit:first-child
+{
+    width: 40px;
+    height: 36px;
+    margin-left: -2px;
+}
+form input.text
+{
+    width: 300px;
+}
+form input.submit:last-child
+{
+    width: 65px;
+    height: 36px;
+}
