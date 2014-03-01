@@ -1,0 +1,103 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Controls">
+      <UniqueIdentifier>{c0161f56-209b-477e-8fed-e1e45495d6d4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Controls\Forms">
+      <UniqueIdentifier>{e0170495-fc20-4dda-9123-c34c91e592e1}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\Source\Controls\Lua\DataFormatter.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\DataSource.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\ElementDataGrid.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\ElementDataGridRow.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\ElementTabSet.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\LuaDataFormatter.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\LuaDataSource.cpp">
+      <Filter>Controls</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\ElementForm.cpp">
+      <Filter>Controls\Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\ElementFormControl.cpp">
+      <Filter>Controls\Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\ElementFormControlDataSelect.cpp">
+      <Filter>Controls\Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\ElementFormControlInput.cpp">
+      <Filter>Controls\Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\ElementFormControlSelect.cpp">
+      <Filter>Controls\Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\ElementFormControlTextArea.cpp">
+      <Filter>Controls\Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\SelectOptionsProxy.cpp">
+      <Filter>Controls\Forms</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Source\Controls\Lua\Controls.cpp" />
+    <ClCompile Include="..\..\Source\Core\Lua\precompiled.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\Source\Controls\Lua\DataFormatter.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\DataSource.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\ElementDataGrid.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\ElementDataGridRow.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\ElementTabSet.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\LuaDataFormatter.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\LuaDataSource.h">
+      <Filter>Controls</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\ElementForm.h">
+      <Filter>Controls\Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\ElementFormControl.h">
+      <Filter>Controls\Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\ElementFormControlDataSelect.h">
+      <Filter>Controls\Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\ElementFormControlInput.h">
+      <Filter>Controls\Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\ElementFormControlSelect.h">
+      <Filter>Controls\Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\ElementFormControlTextArea.h">
+      <Filter>Controls\Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Source\Controls\Lua\SelectOptionsProxy.h">
+      <Filter>Controls\Forms</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Include\Rocket\Controls\Lua\Controls.h" />
+    <ClInclude Include="..\..\Source\Core\Lua\precompiled.h" />
+  </ItemGroup>
+</Project>

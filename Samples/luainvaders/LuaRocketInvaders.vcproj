@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9.00"
 	Name="LuaRocketInvaders"
-	ProjectGUID="{D343E357-BF62-424F-B22A-16D7B8A6422B}"
+	ProjectGUID="{7B2E31C9-53EE-4264-AAD4-C48EB1005FA6}"
 	RootNamespace="LuaRocketInvaders"
 	TargetFrameworkVersion="131072"
 	>
