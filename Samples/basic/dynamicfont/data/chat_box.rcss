@@ -6,7 +6,7 @@ body
     
     font-weight: normal;
     font-style: normal;
-    font-size: 15;
+    font-size: 16;
     color: white;   
     
     outline-font-effect: outline;
@@ -45,7 +45,7 @@ input.text
     margin-top: -10px;
 
     color: black;
-    font-size: 18;
+    font-size: 14;
     outline-font-effect: none;
 }
 

@@ -311,6 +311,7 @@ int FontFaceHandle::GenerateString(GeometryList& geometry, const WString& string
 		const word* string_end = string.CString() + string.Length();
 
 		// Dynamic build glyph and generate character
+		FT_Set_Char_Size(ft_face, 0, size << 6, 0, 0);
 		for (; string_iterator != string_end; string_iterator++)
 		{
 			if (*string_iterator >= glyph_count)

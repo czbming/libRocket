@@ -78,7 +78,7 @@ private:
 
 	byte* texture_data;
 	int placed_height;
-	mutable int prior_placed_height;
+	mutable int filled_height;
 	bool is_full;
 };
 

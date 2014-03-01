@@ -37,7 +37,7 @@ namespace Core {
 TextureLayoutTexture::TextureLayoutTexture() : dimensions(0, 0)
 {
 	texture_data = NULL;
-	placed_height = prior_placed_height = 1;
+	placed_height = filled_height = 1;
 	is_full = false;
 }
 
@@ -149,7 +149,7 @@ int TextureLayoutTexture::Generate(TextureLayout& layout, int maximum_dimensions
 			rows.push_back(row);
 			num_placed_rectangles += row_size;
 		}
-		prior_placed_height = placed_height;
+		filled_height = placed_height - rows.back().GetHeight() - 1;
 
 		// If the rectangles were successfully laid out within the texture limits, we're done.
 		if (success)
@@ -183,7 +183,7 @@ int TextureLayoutTexture::Generate(TextureLayout& layout, int maximum_dimensions
 
 		rows.clear();
 		num_placed_rectangles = 0;
-		prior_placed_height = placed_height = 1;
+		filled_height = placed_height = 1;
 	}
 }
 
@@ -216,20 +216,16 @@ void TextureLayoutTexture::DeallocateTexture()
 
 const byte* TextureLayoutTexture::GetTextureData( Vector2i& offset_position, Vector2i& sub_dimensions ) const
 {
-	if (!texture_data)
+	if (!texture_data || placed_height == 1)
 		return NULL;
 
 	offset_position.x = 0;
-	offset_position.y = prior_placed_height - 1;
-	if (prior_placed_height != 1)
-		offset_position.y -= rows.back().GetHeight();
+	offset_position.y = filled_height;
 
 	sub_dimensions.x = dimensions.x;
-	sub_dimensions.y = placed_height - prior_placed_height;
-	if (prior_placed_height != 1)
-		sub_dimensions.y += (rows.back().GetHeight() + 1);
+	sub_dimensions.y = placed_height - filled_height;
+	filled_height = placed_height - rows.back().GetHeight() - 1;
 
-	prior_placed_height = placed_height;
 	return texture_data + offset_position.y * dimensions.x * 4 + offset_position.x;
 }
 
